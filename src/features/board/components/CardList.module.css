@@ -1,0 +1,11 @@
+.emptyText {
+  padding-left: 12px;
+  font-size: 15px;
+  line-height: 37px;
+  color: #1e1e1e;
+}
+
+.cardList {
+  display: flex;
+  gap: 0 12px;
+}

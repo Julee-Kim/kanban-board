@@ -1,0 +1,9 @@
+.emptyText {
+  line-height: 44px;
+}
+
+.columnList {
+  display: flex;
+  align-items: flex-start;
+  gap: 0 12px;
+}
