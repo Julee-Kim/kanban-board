@@ -1,0 +1,131 @@
+/* 1) 박스 모델 & 핵심 기본값 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scrollbar-gutter: stable both-edges;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #fff;
+}
+
+body {
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 2) 타이포 & 간격 초기화(필요 최소한) */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 3) 이미지/미디어 */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+/* 4) 링크 */
+a {
+  color: inherit;
+  text-decoration: none;
+  text-decoration-skip-ink: auto;
+}
+
+/* 5) 버튼 & 폼 요소 */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  padding: 0;
+  cursor: pointer;
+  border: 0;
+  background: none;
+}
+
+input,
+textarea,
+select {
+  border: 0;
+  background: transparent;
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+}
+
+::placeholder {
+  color: inherit;
+  opacity: 0.6;
+}
+
+/* 숫자 인풋 스피너 제거 (웹킷/파폭) */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 6) 포커스 가시성: 키보드 접근성을 위해 유지 */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid #2684ff; /* 브랜드 컬러에 맞춰 변경 */
+  outline-offset: 2px;
+}
+
+/* 7) 테이블 */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
