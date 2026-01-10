@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import type { DragEndEvent, DragOverEvent, DragStartEvent } from '@dnd-kit/core'
 import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
-import type { DragStartEvent, DragOverEvent, DragEndEvent } from '@dnd-kit/core'
-import type { ColumnType, CardType } from '@/features/board/types.ts'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import type { CardType, ColumnType } from '@/features/board/types.ts'
+import { updateCardPosition } from '@/api/board.ts'
 
 /**
  * useCardDragAndDrop 훅의 입력 파라미터
@@ -45,11 +47,11 @@ const findCardById = (cardId: string, columns: ColumnType[]): CardType | null =>
 
 /**
  * 같은 컬럼 내에서 카드 순서 변경
- * @param columns - 컬럼 배열
+ * @param columns - 전체 컬럼 배열
  * @param columnId - 카드가 속한 컬럼 ID
- * @param activeId - 드래그 중인 카드 ID
- * @param overId - 드롭 대상 카드 ID
- * @returns 새로운 컬럼 배열
+ * @param activeId - 드래그 중인 카드 ID (이동할 카드)
+ * @param overId - 드롭 대상 카드 ID (이 카드의 위치로 이동)
+ * @returns 업데이트된 컬럼 배열
  */
 const reorderCardsInColumnHelper = (
   columns: ColumnType[],
@@ -58,22 +60,29 @@ const reorderCardsInColumnHelper = (
   overId: string
 ): ColumnType[] => {
   return columns.map((column) => {
+    // 대상 컬럼이 아니면 그대로 반환
     if (column.id !== columnId) return column
 
     const cards = [...column.cards]
+
     // 드래그 중인 카드의 현재 인덱스
     const activeIndex = cards.findIndex((card) => card.id === activeId)
-    // 드롭 대상 카드의 인덱스
+    // 드롭 대상 카드의 인덱스 (여기로 이동)
     const overIndex = cards.findIndex((card) => card.id === overId)
 
     // 유효하지 않은 인덱스이거나 같은 위치면 업데이트 안 함
     if (activeIndex === -1 || overIndex === -1 || activeIndex === overIndex) return column
 
-    // 카드 순서 변경: activeIndex 위치의 카드를 제거하고 overIndex 위치에 삽입
-    const removedCard = cards.splice(activeIndex, 1)[0]
-    cards.splice(overIndex, 0, removedCard)
+    /**
+     * 카드 순서 변경 로직
+     * 1. activeIndex 위치의 카드를 배열에서 제거
+     * 2. overIndex 위치에 제거한 카드를 삽입
+     * splice(index, 0, item): index 위치에 item 삽입, 기존 요소들은 뒤로 밀림
+     */
+    const [movedCard] = cards.splice(activeIndex, 1)
+    cards.splice(overIndex, 0, movedCard)
 
-    // order 필드 업데이트
+    // order 필드를 배열 인덱스에 맞게 업데이트 (0, 1, 2, ...)
     const updatedCards = cards.map((card, index) => ({
       ...card,
       order: index,
@@ -91,27 +100,46 @@ const reorderCardsInColumnHelper = (
  * @param column - 도착 컬럼
  * @param cardToMove - 이동할 카드
  * @param cardId - 이동할 카드 ID
- * @param insertAfterCardId - 이 카드 뒤에 삽입 (없으면 맨 끝에 추가)
+ * @param insertAtCardId - 이 카드 위치에 삽입 (없으면 맨 끝에 추가)
  * @returns 업데이트된 컬럼
  */
 const addCardToColumn = (
   column: ColumnType,
   cardToMove: CardType,
   cardId: string,
-  insertAfterCardId?: string
+  insertAtCardId?: string
 ): ColumnType => {
-  // handleDragOver가 매우 자주 호출되므로, 상태 업데이트 전에 중복 추가를 방지하기 위한 체크
-  const cardExists = column.cards.some((card) => card.id === cardId)
-  if (cardExists) return column
-
   // 삽입 위치 결정
   let insertIndex = column.cards.length // 기본값: 맨 끝
 
-  // 특정 위치에 삽입
-  if (insertAfterCardId) {
-    const insertAfterIndex = column.cards.findIndex((card) => card.id === insertAfterCardId)
-    if (insertAfterIndex !== -1) {
-      insertIndex = insertAfterIndex + 1
+  // 특정 카드의 위치에 삽입 (그 카드를 밀어내고 그 자리에 삽입)
+  if (insertAtCardId) {
+    const targetIndex = column.cards.findIndex((card) => card.id === insertAtCardId)
+    if (targetIndex !== -1) {
+      insertIndex = targetIndex
+    }
+  }
+
+  // 드롭한 카드가 목표 컬럼에 이미 존재하는지 확인
+  const existingIndex = column.cards.findIndex((card) => card.id === cardId)
+
+  const newCards = [...column.cards]
+
+  // 카드가 이미 존재하면 먼저 제거 및 조기 반환 체크
+  if (existingIndex !== -1) {
+    // 제거 후 삽입 위치를 조정하여 실제 삽입될 위치 계산
+    const adjustedInsertIndex = existingIndex < insertIndex ? insertIndex - 1 : insertIndex
+
+    // 이미 올바른 위치에 있으면 변경 불필요 (조기 반환으로 중복 작업 방지)
+    if (existingIndex === adjustedInsertIndex) {
+      return column
+    }
+
+    // 카드 제거
+    newCards.splice(existingIndex, 1)
+    // 제거 후 insertIndex 조정 (제거한 카드가 삽입 위치보다 앞에 있었으면)
+    if (existingIndex < insertIndex) {
+      insertIndex--
     }
   }
 
@@ -122,7 +150,6 @@ const addCardToColumn = (
   }
 
   // 카드를 특정 위치에 삽입
-  const newCards = [...column.cards]
   newCards.splice(insertIndex, 0, movedCard)
 
   // order 재정렬
@@ -143,7 +170,7 @@ const addCardToColumn = (
  * @param cardId - 이동할 카드 ID
  * @param fromColumnId - 출발 컬럼 ID
  * @param toColumnId - 도착 컬럼 ID
- * @param insertAfterCardId - 이 카드 뒤에 삽입 (없으면 맨 끝에 추가)
+ * @param insertAtCardId - 이 카드 위치에 삽입 (없으면 맨 끝에 추가)
  * @returns 새로운 컬럼 배열
  */
 const moveCardToColumnHelper = (
@@ -151,7 +178,7 @@ const moveCardToColumnHelper = (
   cardId: string,
   fromColumnId: string,
   toColumnId: string,
-  insertAfterCardId?: string
+  insertAtCardId?: string
 ): ColumnType[] => {
   // 출발 컬럼과 도착 컬럼이 같으면 변경 없음
   if (fromColumnId === toColumnId) return columns
@@ -176,7 +203,7 @@ const moveCardToColumnHelper = (
   // 3. 도착 컬럼에 카드 추가
   return columnsWithoutCard.map((column) => {
     if (column.id === toColumnId) {
-      return addCardToColumn(column, cardToMove, cardId, insertAfterCardId)
+      return addCardToColumn(column, cardToMove, cardId, insertAtCardId)
     }
     return column
   })
@@ -190,7 +217,28 @@ const moveCardToColumnHelper = (
 export const useCardDragAndDrop = ({
   serverColumns,
 }: UseCardDragAndDropProps): UseCardDragAndDropReturn => {
-  // 클라이언트 UI 상태 (드래그 중 임시 상태)
+  const queryClient = useQueryClient()
+
+  // 카드 위치 업데이트 mutation
+  const updateCardPositionMutation = useMutation({
+    mutationFn: ({
+      cardId,
+      columnId,
+      order,
+    }: {
+      cardId: string
+      columnId: string
+      order: number
+    }) => updateCardPosition(cardId, columnId, order),
+    onSuccess: async () => {
+      // 성공 시 컬럼 목록 쿼리 무효화하여 최신 데이터 가져오기
+      await queryClient.invalidateQueries({ queryKey: ['columns'] })
+      // 서버 데이터 갱신 완료 후 임시 상태 리셋
+      setLocalColumns(null)
+    },
+  })
+
+  // 드래그 중 임시 상태
   // 드래그 중에는 localColumns 사용, 평소에는 serverColumns 사용
   const [localColumns, setLocalColumns] = useState<ColumnType[] | null>(null)
 
@@ -212,8 +260,8 @@ export const useCardDragAndDrop = ({
   /**
    * 같은 컬럼 내에서 카드 순서 변경
    * @param columnId - 카드가 속한 컬럼 ID
-   * @param activeId - 드래그 중인 카드 ID
-   * @param overId - 드롭 대상 카드 ID
+   * @param activeId - 드래그 중인 카드 ID (이동할 카드)
+   * @param overId - 드롭 대상 카드 ID (이 카드의 위치로 이동)
    */
   const reorderCardsInColumn = (columnId: string, activeId: string, overId: string) => {
     setLocalColumns((prevColumns) => {
@@ -227,23 +275,17 @@ export const useCardDragAndDrop = ({
    * @param cardId - 이동할 카드 ID
    * @param fromColumnId - 출발 컬럼 ID
    * @param toColumnId - 도착 컬럼 ID
-   * @param insertAfterCardId - 이 카드 뒤에 삽입 (없으면 맨 끝에 추가)
+   * @param insertAtCardId - 이 카드 위치에 삽입 (없으면 맨 끝에 추가)
    */
   const moveCardToColumn = (
     cardId: string,
     fromColumnId: string,
     toColumnId: string,
-    insertAfterCardId?: string
+    insertAtCardId?: string
   ) => {
     setLocalColumns((prevColumns) => {
       if (!prevColumns) return null
-      return moveCardToColumnHelper(
-        prevColumns,
-        cardId,
-        fromColumnId,
-        toColumnId,
-        insertAfterCardId
-      )
+      return moveCardToColumnHelper(prevColumns, cardId, fromColumnId, toColumnId, insertAtCardId)
     })
   }
 
@@ -267,69 +309,76 @@ export const useCardDragAndDrop = ({
    * @param event - 드래그 오버 이벤트 (active: 드래그 중인 요소, over: 마우스가 올라간 대상)
    */
   const handleDragOver = (event: DragOverEvent) => {
-    // over: 드래그 중 마우스가 올라간 대상 (카드 또는 컬럼)
     const { over } = event
 
     if (!over || !localColumns || !activeCard) return
 
-    // 현재 카드의 실제 위치 확인 (localColumns에서 찾기)
-    // activeCard.column_id는 드래그 시작 시점의 값이므로, 이동 후에는 실제 위치를 확인해야 함
+    // 현재 카드의 실제 위치 확인
     const currentCard = findCardById(activeCard.id, localColumns)
     if (!currentCard) return
 
-    // 마우스가 올라간 대상 확인 - over가 카드인지 확인
+    // 마우스가 올라간 대상 확인
     const overCard = findCardById(over.id as string, localColumns)
-    // 마우스가 올라간 대상 확인 - over가 컬럼인지 확인
     const overColumn = localColumns.find((col) => col.id === over.id)
 
-    // 케이스 1: 다른 컬럼 위로 드래그 (맨 끝에 추가)
-    // currentCard.column_id: 현재 카드의 실제 위치 (이동 후 변경됨)
-    // overColumn.id: 드롭하려는 컬럼
-    // 두 값이 다르면 다른 컬럼으로 이동
-    if (overColumn && currentCard.column_id !== overColumn.id) {
-      moveCardToColumn(activeCard.id, currentCard.column_id, overColumn.id)
-      return
-    }
-
+    // 실제 위치 업데이트
     if (overCard) {
-      // 케이스 2: 다른 컬럼의 카드 위로 드래그 (특정 위치에 삽입)
-      // currentCard.column_id: 현재 카드의 실제 위치
-      // overCard.column_id: 드롭하려는 카드가 속한 컬럼
-      // 두 값이 다르면 다른 컬럼으로 이동
       if (currentCard.column_id !== overCard.column_id) {
+        // 다른 컬럼의 카드 위로 드래그
         moveCardToColumn(activeCard.id, currentCard.column_id, overCard.column_id, overCard.id)
-        return
-      }
-
-      // 케이스 3: 같은 컬럼 내에서 다른 카드 위로 드래그
-      if (activeCard.id !== over.id) {
-        // 순서만 변경
+      } else if (activeCard.id !== over.id) {
+        // 같은 컬럼 내에서 다른 카드 위로 드래그
         reorderCardsInColumn(currentCard.column_id, activeCard.id, over.id as string)
       }
+    } else if (overColumn && currentCard.column_id !== overColumn.id) {
+      // 다른 컬럼의 빈 공간 위로 드래그
+      moveCardToColumn(activeCard.id, currentCard.column_id, overColumn.id)
     }
   }
 
   /**
-   * 드래그 완료 시 로컬 상태 리셋
+   * 드래그 완료 시 로컬 상태 리셋 및 서버 상태 업데이트
    * @param event - 드래그 종료 이벤트 (over: 드롭된 대상)
    */
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     // over: 드래그 중 마우스가 올라간 대상 (카드 또는 컬럼)
     const { over } = event
 
-    if (!over || !localColumns) {
+    if (!over || !localColumns || !activeCard) {
       // 드래그가 취소된 경우 로컬 상태 리셋
       setLocalColumns(null)
       setActiveCard(null)
       return
     }
 
-    // TODO: 나중에 API 연동 시 서버 상태 업데이트 추가
+    // 드래그된 카드의 최종 위치 확인
+    const finalCard = findCardById(activeCard.id, localColumns)
+    if (!finalCard) {
+      setLocalColumns(null)
+      setActiveCard(null)
+      return
+    }
 
-    // 로컬 상태 리셋 (서버 상태 사용)
-    setLocalColumns(null)
-    // 드래그 중인 카드 정보 리셋
+    // 드래그 종료 즉시 activeCard 리셋 (드래그 오버레이 제거)
     setActiveCard(null)
+
+    // 원래 위치와 다른 경우에만 API 호출
+    const originalCard = findCardById(activeCard.id, serverColumns)
+    if (
+      originalCard &&
+      (originalCard.column_id !== finalCard.column_id || originalCard.order !== finalCard.order)
+    ) {
+      // 서버 상태 업데이트
+      updateCardPositionMutation.mutate({
+        cardId: finalCard.id,
+        columnId: finalCard.column_id,
+        order: finalCard.order,
+      })
+      // localColumns는 유지하고 onSuccess에서 리셋
+    } else {
+      // 위치가 변경되지 않았으면 즉시 로컬 상태 리셋
+      setLocalColumns(null)
+    }
   }
 
   return {
