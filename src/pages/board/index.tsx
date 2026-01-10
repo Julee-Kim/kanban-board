@@ -1,10 +1,8 @@
-import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
-import type { DragStartEvent } from '@dnd-kit/core'
-import type { ColumnType } from '@/features/board/types.ts'
+import { DndContext, DragOverlay } from '@dnd-kit/core'
 import { fetchColumns } from '@/api/board.ts'
 import { CardDetailModalProvider } from '@/features/board/contexts/CardDetailModalProvider.tsx'
+import { useCardDragAndDrop } from '@/features/board/hooks/useCardDragAndDrop.ts'
 import ColumnList from '@/features/board/components/ColumnList.tsx'
 import Card from '@/features/board/components/Card.tsx'
 import PButton from '@/components/PButton.tsx'
@@ -17,34 +15,18 @@ const BoardContent = () => {
     queryFn: fetchColumns,
   })
 
-  const columns: ColumnType[] = data?.data ?? []
+  // 서버 상태 (실제 데이터)
+  const serverColumns = data?.data ?? []
 
-  // 드래그 중인 카드 ID 추적
-  const [activeId, setActiveId] = useState<string | null>(null)
-
-  // 드래그 중인 카드 정보 찾기
-  const activeCard = activeId
-    ? columns.flatMap((col) => col.cards).find((card) => card.id === activeId)
-    : null
-
-  // 드래그 센서 설정 (8px 이동해야 드래그 시작)
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  )
-
-  // 드래그 시작 시 activeId 설정
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string)
-  }
-
-  // 드래그 종료 시 activeId 초기화
-  const handleDragEnd = () => {
-    setActiveId(null)
-  }
+  // 드래그 앤 드롭 로직 커스텀 훅
+  const {
+    columns,
+    activeCard,
+    sensors,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd
+  } = useCardDragAndDrop({ serverColumns })
 
   if (isLoading) {
     return <div className={styles.board}>로딩 중...</div>
@@ -55,7 +37,12 @@ const BoardContent = () => {
   }
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+    >
       <div className={styles.board}>
         <ColumnList columns={columns} />
         <PButton className={styles.btnAddColumn}>+ 컬럼 추가</PButton>
@@ -65,9 +52,7 @@ const BoardContent = () => {
       </div>
 
       {/* 드래그 중 카드 그림자 효과 */}
-      <DragOverlay>
-        {activeCard ? <Card card={activeCard} /> : null}
-      </DragOverlay>
+      <DragOverlay>{activeCard ? <Card card={activeCard} /> : null}</DragOverlay>
     </DndContext>
   )
 }
