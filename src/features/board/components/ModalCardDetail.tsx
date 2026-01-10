@@ -43,7 +43,7 @@ const ModalCardDetail = () => {
       <Modal.Overlay />
       <Modal.Content>
         <div className={styles.box}>
-          <label htmlFor="cardTitle" className={styles.label}>
+          <label htmlFor="cardTitle" className={`${styles.label} ${styles.titleLabel}`}>
             Title
           </label>
 
