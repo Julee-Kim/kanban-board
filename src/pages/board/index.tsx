@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { DndContext, DragOverlay } from '@dnd-kit/core'
-import { fetchColumns } from '@/api/board.ts'
+import { fetchColumns } from '@/api/columns.ts'
 import { CardDetailModalProvider } from '@/features/board/contexts/CardDetailModalProvider.tsx'
 import { useCardDragAndDrop } from '@/features/board/hooks/useCardDragAndDrop.ts'
 import ColumnList from '@/features/board/components/ColumnList.tsx'

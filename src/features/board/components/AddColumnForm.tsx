@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import type { ChangeEvent, KeyboardEvent, FormEvent } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createColumn } from '@/api/board.ts'
+import { createColumn } from '@/api/columns.ts'
 import { autoResizeTextarea } from '@/utils/textarea.ts'
 import PButton from '@/components/PButton.tsx'
 import styles from './AddColumnForm.module.css'

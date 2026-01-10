@@ -3,7 +3,7 @@ import type { DragEndEvent, DragOverEvent, DragStartEvent } from '@dnd-kit/core'
 import { PointerSensor, useSensor, useSensors, KeyboardSensor } from '@dnd-kit/core'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { CardType, ColumnType } from '@/features/board/types.ts'
-import { updateCardPosition } from '@/api/board.ts'
+import { updateCardPosition } from '@/api/cards.ts'
 
 /**
  * useCardDragAndDrop 훅의 입력 파라미터
