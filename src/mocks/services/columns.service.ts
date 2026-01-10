@@ -39,6 +39,19 @@ export function createColumn(title: string): void {
   columns.push(newColumn)
 }
 
+/**
+ * 컬럼 제목 수정
+ * @param columnId - 수정할 컬럼 ID
+ * @param title - 새로운 제목
+ */
+export function updateColumnTitle(columnId: string, title: string): boolean {
+  const column = columns.find((c) => c.id === columnId)
+  if (!column) return false
+
+  column.title = title
+  return true
+}
+
 /* ----------------- helpers (function 내부 로직 분리) ----------------- */
 
 /**

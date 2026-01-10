@@ -16,12 +16,39 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 8px;
+  margin-bottom: 8px;
 }
 
 .columnTitle {
+  flex: 1;
+  min-width: 0;
   padding: 8px;
   font-size: 14px;
   word-break: break-word;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 4px;
+}
+
+.columnTitle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.columnTitleInput {
+  flex: 1;
+  min-width: 0;
+  padding: 8px;
+  font-size: 14px;
+  background-color: #fff;
+  border: 2px solid rgb(185 172 255);
+  border-radius: 4px;
+  resize: none;
+  overflow: hidden;
+}
+
+.columnTitleInput:focus {
+  outline: none;
+  border-color: var(--primary);
 }
 
 .btnDeleteColumn {
