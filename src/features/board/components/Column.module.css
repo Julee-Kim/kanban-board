@@ -3,6 +3,12 @@
   width: 270px;
   background-color: var(--surface-1);
   border-radius: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.columnDragOver {
+  background-color: rgb(185 172 255 / 0.3);
+  box-shadow: 0 0 0 2px rgb(185 172 255);
 }
 
 .columnTitleWrap {

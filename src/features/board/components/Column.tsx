@@ -10,10 +10,13 @@ interface ColumnProps {
 
 const Column = ({ column }: ColumnProps) => {
   // 컬럼을 드롭 가능한 영역으로 설정
-  const { setNodeRef } = useDroppable({ id: column.id })
+  const { setNodeRef, isOver } = useDroppable({ id: column.id })
 
   return (
-    <li ref={setNodeRef} className={styles.column}>
+    <li
+      ref={setNodeRef}
+      className={`${styles.column} ${isOver ? styles.columnDragOver : ''}`}
+    >
       <div className={styles.columnTitleWrap}>
         <h2 className={styles.columnTitle}>{column.title}</h2>
         <PButton className={styles.btnDeleteColumn}>삭제</PButton>
