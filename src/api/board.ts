@@ -14,6 +14,27 @@ export const fetchColumns = async (): Promise<FetchColumnsRes> => {
 }
 
 /**
+ * 컬럼 생성 API
+ * @param title - 생성할 컬럼 제목
+ */
+export const createColumn = async (title: string): Promise<void> => {
+  try {
+    const res = await fetch('/api/columns', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ title }),
+    })
+
+    if (!res.ok) throw new Error('createColumn failed')
+  } catch (err) {
+    console.error('createColumn fetch error:', err)
+    throw err
+  }
+}
+
+/**
  * 카드 위치 업데이트 API
  * @param cardId - 업데이트할 카드 ID
  * @param columnId - 새로운 컬럼 ID

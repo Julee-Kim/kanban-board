@@ -2,15 +2,3 @@
   display: flex;
   padding: 20px 0;
 }
-
-.btnAddColumn {
-  margin-left: 20px;
-  padding: 0 5px;
-  min-width: 120px;
-  width: 270px;
-  height: 44px;
-  font-weight: 600;
-  color: #fff;
-  background-color: var(--primary);
-  border-radius: 10px;
-}

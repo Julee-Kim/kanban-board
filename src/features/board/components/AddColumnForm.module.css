@@ -1,0 +1,59 @@
+.addColumnForm {
+  align-self: flex-start;
+  margin-left: 20px;
+  padding: 8px;
+  width: 270px;
+  background-color: var(--surface-1);
+  border-radius: 12px;
+}
+
+.addColumnForm form {
+  display: flex;
+  flex-direction: column;
+}
+
+.columnTitleInput {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  background-color: #fff;
+  border: 2px solid rgb(185 172 255);
+  border-radius: 8px;
+  resize: none;
+  overflow: hidden;
+}
+
+.columnTitleInput:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.columnTitleInput::placeholder {
+  color: #999;
+}
+
+.addColumnButtons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.btnSubmitColumn {
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background-color: var(--primary);
+  border-radius: 6px;
+}
+
+.btnCancelColumn {
+  padding: 6px 12px;
+  font-size: 14px;
+  color: #44546f;
+  border-radius: 6px;
+}
+
+.btnCancelColumn:hover {
+  background-color: rgb(185 172 255 / 0.2);
+}

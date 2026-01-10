@@ -1,0 +1,10 @@
+.btnAddColumn {
+  align-self: flex-start;
+  margin-left: 20px;
+  padding: 12px;
+  width: 270px;
+  font-weight: 600;
+  color: #fff;
+  background-color: var(--primary);
+  border-radius: 12px;
+}

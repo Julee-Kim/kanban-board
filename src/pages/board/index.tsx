@@ -5,7 +5,7 @@ import { CardDetailModalProvider } from '@/features/board/contexts/CardDetailMod
 import { useCardDragAndDrop } from '@/features/board/hooks/useCardDragAndDrop.ts'
 import ColumnList from '@/features/board/components/ColumnList.tsx'
 import Card from '@/features/board/components/Card.tsx'
-import PButton from '@/components/PButton.tsx'
+import AddColumn from '@/features/board/components/AddColumn.tsx'
 import ModalCardDetail from '@/features/board/components/ModalCardDetail.tsx'
 import styles from './index.module.css'
 
@@ -47,7 +47,9 @@ const BoardContent = () => {
     >
       <div className={styles.board}>
         <ColumnList columns={columns} />
-        <PButton className={styles.btnAddColumn}>+ 컬럼 추가</PButton>
+
+        {/* 컬럼 추가 UI */}
+        <AddColumn />
 
         {/* Card 클릭을 통해 열리고, CardDetailModalProvider에서 제어되는 카드 상세 모달 */}
         <ModalCardDetail />

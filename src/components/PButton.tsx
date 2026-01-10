@@ -6,11 +6,12 @@ type PButtonProps = {
   children?: ReactNode
   style?: CSSProperties
   className?: string
-} & ButtonHTMLAttributes<HTMLButtonElement>
+  type?: 'button' | 'submit' | 'reset'
+} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'>
 
-const PButton = ({ children, style, className = '', ...restProps }: PButtonProps) => {
+const PButton = ({ children, style, className = '', type = 'button', ...restProps }: PButtonProps) => {
   return (
-    <button type="button" style={style} className={className} {...restProps}>
+    <button type={type} style={style} className={className} {...restProps}>
       {children}
     </button>
   )
