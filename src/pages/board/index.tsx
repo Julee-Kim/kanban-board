@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import type { ColumnType } from '@/features/board/types.ts'
 import { fetchColumns } from '@/api/board.ts'
 import { CardDetailModalProvider } from '@/features/board/contexts/CardDetailModalProvider.tsx'
@@ -8,15 +8,21 @@ import ModalCardDetail from '@/features/board/components/ModalCardDetail.tsx'
 import styles from './index.module.css'
 
 const BoardContent = () => {
-  const [columns, setColumns] = useState<ColumnType[]>([])
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['columns'],
+    queryFn: fetchColumns,
+  })
 
-  useEffect(() => {
-    const init = async () => {
-      const data = await fetchColumns()
-      setColumns(data.data)
-    }
-    init()
-  }, [])
+  const columns: ColumnType[] = data?.data ?? []
+
+  if (isLoading) {
+    return <div className={styles.board}>로딩 중...</div>
+  }
+
+  if (error) {
+    return <div className={styles.board}>에러가 발생했습니다.</div>
+  }
+
   return (
     <div className={styles.board}>
       <ColumnList columns={columns} />
