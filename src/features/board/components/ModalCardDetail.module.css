@@ -1,0 +1,48 @@
+.box {
+  padding-top: 20px;
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+}
+
+.textarea {
+  width: 100%;
+  font-weight: 400;
+}
+
+.dateArea {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  row-gap: 6px;
+  column-gap: 8px;
+  padding-bottom: 20px;
+}
+
+.dateArea dt {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.modalFooterInner {
+  text-align: right;
+}
+
+.btnClose, .btnSave {
+  padding: 5px 15px;
+  height: 35px;
+  font-size: 14px;
+  border-radius: 5px;
+}
+
+.btnClose {
+  border: 1px solid #d9d9d9;
+}
+
+.btnSave {
+  margin-left: 10px;
+  color: #fff;
+  background-color: var(--primary);
+}
+
