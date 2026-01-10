@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { DragEndEvent, DragOverEvent, DragStartEvent } from '@dnd-kit/core'
-import { PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { PointerSensor, useSensor, useSensors, KeyboardSensor } from '@dnd-kit/core'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { CardType, ColumnType } from '@/features/board/types.ts'
 import { updateCardPosition } from '@/api/board.ts'
@@ -29,6 +29,8 @@ interface UseCardDragAndDropReturn {
   handleDragOver: (event: DragOverEvent) => void
   // 드래그 종료 이벤트 핸들러
   handleDragEnd: (event: DragEndEvent) => void
+  // 드래그 취소 이벤트 핸들러 (ESC 키 등)
+  handleDragCancel: () => void
 }
 
 /**
@@ -248,13 +250,14 @@ export const useCardDragAndDrop = ({
   // 표시할 컬럼: 드래그 중이면 localColumns, 아니면 serverColumns
   const columns = localColumns ?? serverColumns
 
-  // 드래그 센서 설정 (8px 이동해야 드래그 시작)
+  // 드래그 센서 설정 (8px 이동해야 드래그 시작, ESC 키로 취소 가능)
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 8,
       },
-    })
+    }),
+    useSensor(KeyboardSensor)
   )
 
   /**
@@ -381,6 +384,16 @@ export const useCardDragAndDrop = ({
     }
   }
 
+  /**
+   * 드래그 취소 시 로컬 상태 리셋
+   * ESC 키를 누르면 드래그가 취소되고 원래 상태로 복원됨
+   */
+  const handleDragCancel = () => {
+    // 임시 상태를 모두 리셋하여 원래 상태로 복원
+    setLocalColumns(null)
+    setActiveCard(null)
+  }
+
   return {
     columns,
     activeCard,
@@ -388,5 +401,6 @@ export const useCardDragAndDrop = ({
     handleDragStart,
     handleDragOver,
     handleDragEnd,
+    handleDragCancel,
   }
 }

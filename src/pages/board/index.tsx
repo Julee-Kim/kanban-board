@@ -25,7 +25,8 @@ const BoardContent = () => {
     sensors,
     handleDragStart,
     handleDragOver,
-    handleDragEnd
+    handleDragEnd,
+    handleDragCancel,
   } = useCardDragAndDrop({ serverColumns })
 
   if (isLoading) {
@@ -42,6 +43,7 @@ const BoardContent = () => {
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
     >
       <div className={styles.board}>
         <ColumnList columns={columns} />
