@@ -1,4 +1,6 @@
 import type { CardType } from '@/features/board/types.ts'
+import { useCardDetailModalActions } from '@/features/board/contexts/useCardDetailModal.ts'
+import PButton from '@/components/PButton.tsx'
 import styles from '@/features/board/components/Card.module.css'
 
 interface CardProps {
@@ -6,11 +8,13 @@ interface CardProps {
 }
 
 const Card = ({ card }: CardProps) => {
+  const { openModal } = useCardDetailModalActions()
+
   return (
     <li className={styles.card}>
-      <button type="button" className={styles.cardContent}>
+      <PButton className={styles.cardContent} onClick={() => openModal(card)}>
         {card.title}
-      </button>
+      </PButton>
     </li>
   )
 }
