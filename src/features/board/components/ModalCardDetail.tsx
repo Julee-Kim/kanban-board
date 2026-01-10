@@ -82,10 +82,13 @@ const ModalCardDetail = () => {
       </Modal.Content>
       <Modal.Footer>
         <div className={styles.modalFooterInner}>
-          <PButton className={styles.btnClose} onClick={closeModal}>
-            닫기
-          </PButton>
-          <PButton className={styles.btnSave}>저장</PButton>
+          <PButton className={styles.btnDelete}>삭제</PButton>
+          <div>
+            <PButton className={styles.btnClose} onClick={closeModal}>
+              닫기
+            </PButton>
+            <PButton className={styles.btnSave}>저장</PButton>
+          </div>
         </div>
       </Modal.Footer>
     </Modal>

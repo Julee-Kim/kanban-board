@@ -33,15 +33,23 @@
 }
 
 .modalFooterInner {
-  text-align: right;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.btnClose, .btnSave {
+.btnClose, .btnSave, .btnDelete {
   padding: 5px 15px;
   height: 35px;
   font-size: 14px;
   border-radius: 5px;
 }
+
+.btnDelete {
+  color: #fff;
+  background-color: #ff0000;
+}
+
 
 .btnClose {
   border: 1px solid #d9d9d9;
