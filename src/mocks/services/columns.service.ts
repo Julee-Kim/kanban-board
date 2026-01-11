@@ -52,6 +52,27 @@ export function updateColumnTitle(columnId: string, title: string): boolean {
   return true
 }
 
+/**
+ * 컬럼 삭제
+ * @param columnId - 삭제할 컬럼 ID
+ */
+export function deleteColumn(columnId: string): boolean {
+  const columnIndex = columns.findIndex((c) => c.id === columnId)
+  if (columnIndex === -1) return false
+
+  // 컬럼 삭제
+  columns.splice(columnIndex, 1)
+
+  // 해당 컬럼의 카드들도 삭제
+  for (let i = cards.length - 1; i >= 0; i--) {
+    if (cards[i].columnId === columnId) {
+      cards.splice(i, 1)
+    }
+  }
+
+  return true
+}
+
 /* ----------------- helpers (function 내부 로직 분리) ----------------- */
 
 /**

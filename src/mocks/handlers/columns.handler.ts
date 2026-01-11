@@ -1,5 +1,10 @@
 import { http, HttpResponse } from 'msw'
-import { getColumnsWithCards, createColumn, updateColumnTitle } from '../services/columns.service'
+import {
+  getColumnsWithCards,
+  createColumn,
+  updateColumnTitle,
+  deleteColumn,
+} from '../services/columns.service'
 
 export const columnsHandlers = [
   http.get('/api/columns', () => {
@@ -17,6 +22,18 @@ export const columnsHandlers = [
     const body = (await request.json()) as { title: string }
 
     const success = updateColumnTitle(id as string, body.title)
+
+    if (!success) {
+      return HttpResponse.json({ error: 'Column not found' }, { status: 404 })
+    }
+
+    return HttpResponse.json({ success: true })
+  }),
+
+  http.delete('/api/columns/:id', ({ params }) => {
+    const { id } = params
+
+    const success = deleteColumn(id as string)
 
     if (!success) {
       return HttpResponse.json({ error: 'Column not found' }, { status: 404 })

@@ -55,3 +55,20 @@ export const updateColumnTitle = async (columnId: string, title: string): Promis
     throw err
   }
 }
+
+/**
+ * 컬럼 삭제 API
+ * @param columnId - 삭제할 컬럼 ID
+ */
+export const deleteColumn = async (columnId: string): Promise<void> => {
+  try {
+    const res = await fetch(`/api/columns/${columnId}`, {
+      method: 'DELETE',
+    })
+
+    if (!res.ok) throw new Error('deleteColumn failed')
+  } catch (err) {
+    console.error('deleteColumn fetch error:', err)
+    throw err
+  }
+}
