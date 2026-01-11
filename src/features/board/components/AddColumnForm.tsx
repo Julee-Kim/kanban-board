@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { createColumn } from '@/api/columns.ts'
 import { COLUMN_TITLE_MAX_LENGTH } from '@/features/board/constants.ts'
 import AddItemForm from '@/features/board/components/AddItemForm.tsx'
@@ -16,6 +17,9 @@ const AddColumnForm = ({ onCancel }: AddColumnFormProps) => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['columns'] })
       onCancel()
+    },
+    onError: () => {
+      toast.error('컬럼 생성에 실패했습니다.')
     },
   })
 
