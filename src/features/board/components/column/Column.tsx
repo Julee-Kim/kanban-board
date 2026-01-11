@@ -5,11 +5,11 @@ import { useDroppable } from '@dnd-kit/core'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { updateColumnTitle, deleteColumn } from '@/api/columns.ts'
 import { removeColumnFromCache, updateColumnTitleInCache } from '@/features/board/utils/optimisticUpdate'
-import EditableText from '@/features/board/components/EditableText.tsx'
-import AddCardForm from '@/features/board/components/AddCardForm.tsx'
+import EditableText from '@/features/board/components/shared/EditableText.tsx'
+import AddCardForm from '@/features/board/components/shared/AddCardForm.tsx'
 import PButton from '@/components/PButton.tsx'
-import CardList from '@/features/board/components/CardList.tsx'
-import styles from '@/features/board/components/Column.module.css'
+import CardList from '@/features/board/components/card/CardList.tsx'
+import styles from '@/features/board/components/column/Column.module.css'
 
 interface ColumnProps {
   column: ColumnType

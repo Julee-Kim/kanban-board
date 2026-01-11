@@ -3,7 +3,7 @@ import type { CardType } from '@/features/board/types.ts'
 import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { useCardDetailModalActions } from '@/features/board/contexts/useCardDetailModal.ts'
 import PButton from '@/components/PButton.tsx'
-import styles from '@/features/board/components/Card.module.css'
+import styles from '@/features/board/components/card/Card.module.css'
 
 interface CardProps {
   card: CardType

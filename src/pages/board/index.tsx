@@ -7,11 +7,11 @@ import {
   useCardDetailModalActions,
 } from '@/features/board/contexts/useCardDetailModal.ts'
 import { useCardDragAndDrop } from '@/features/board/hooks/useCardDragAndDrop.ts'
-import ColumnList from '@/features/board/components/ColumnList.tsx'
-import Card from '@/features/board/components/Card.tsx'
-import AddColumn from '@/features/board/components/AddColumn.tsx'
-import ModalCardDetail from '@/features/board/components/ModalCardDetail.tsx'
-import BoardSkeleton from '@/features/board/components/BoardSkeleton.tsx'
+import ColumnList from '@/features/board/components/column/ColumnList.tsx'
+import Card from '@/features/board/components/card/Card.tsx'
+import AddColumn from '@/features/board/components/column/AddColumn.tsx'
+import ModalCardDetail from '@/features/board/components/card/ModalCardDetail.tsx'
+import BoardSkeleton from '@/features/board/components/shared/BoardSkeleton.tsx'
 import ErrorMessage from '@/components/ErrorMessage.tsx'
 import styles from './index.module.css'
 

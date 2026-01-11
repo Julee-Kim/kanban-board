@@ -1,5 +1,5 @@
 import type { ColumnType } from '@/features/board/types.ts'
-import Column from '@/features/board/components/Column.tsx'
+import Column from '@/features/board/components/column/Column.tsx'
 import styles from './ColumnList.module.css'
 
 interface ColumnListProps {

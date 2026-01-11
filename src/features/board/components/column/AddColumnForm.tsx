@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createColumn } from '@/api/columns.ts'
 import { COLUMN_TITLE_MAX_LENGTH } from '@/features/board/constants.ts'
-import AddItemForm from '@/features/board/components/AddItemForm.tsx'
+import AddItemForm from '@/features/board/components/shared/AddItemForm.tsx'
 import styles from './AddColumnForm.module.css'
 
 interface AddColumnFormProps {

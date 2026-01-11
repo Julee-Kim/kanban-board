@@ -1,5 +1,5 @@
 import type { CardType } from '@/features/board/types.ts'
-import Card from '@/features/board/components/Card.tsx'
+import Card from '@/features/board/components/card/Card.tsx'
 import styles from './CardList.module.css'
 
 interface CardListProps {
