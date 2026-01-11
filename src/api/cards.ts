@@ -1,4 +1,26 @@
 /**
+ * 카드 생성 API
+ * @param columnId - 카드를 추가할 컬럼 ID
+ * @param title - 카드 제목
+ */
+export const createCard = async (columnId: string, title: string): Promise<void> => {
+  try {
+    const res = await fetch('/api/cards', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ column_id: columnId, title }),
+    })
+
+    if (!res.ok) throw new Error('createCard failed')
+  } catch (err) {
+    console.error('createCard fetch error:', err)
+    throw err
+  }
+}
+
+/**
  * 카드 내용 수정 API
  * @param cardId - 수정할 카드 ID
  * @param title - 새로운 제목

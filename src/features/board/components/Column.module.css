@@ -1,6 +1,10 @@
 .column {
-  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  padding: 10px 8px;
   width: 270px;
+  max-height: 100%;
   background-color: var(--surface-1);
   border-radius: 12px;
   transition: background-color 0.2s ease;
@@ -12,11 +16,20 @@
 }
 
 .columnTitleWrap {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 8px;
   margin-bottom: 8px;
+}
+
+.columnContent {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #091e4224 #091e420f;
 }
 
 .columnTitle {
@@ -64,7 +77,6 @@
 }
 
 .btnAddCard {
-  margin-top: 10px;
   padding: 5px 8px;
   width: 100%;
   font-size: 14px;

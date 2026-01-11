@@ -1,5 +1,10 @@
 import { http, HttpResponse } from 'msw'
-import { updateCard, updateCardPosition, deleteCard } from '../services/cards.service'
+import { createCard, updateCard, updateCardPosition, deleteCard } from '../services/cards.service'
+
+interface CreateCardBody {
+  column_id: string
+  title: string
+}
 
 interface UpdateCardBody {
   title?: string
@@ -9,6 +14,12 @@ interface UpdateCardBody {
 }
 
 export const cardsHandlers = [
+  http.post('/api/cards', async ({ request }) => {
+    const body = (await request.json()) as CreateCardBody
+    createCard(body.column_id, body.title)
+    return HttpResponse.json({ success: true })
+  }),
+
   http.patch('/api/cards/:id', async ({ params, request }) => {
     const { id } = params
     const body = (await request.json()) as UpdateCardBody

@@ -1,14 +1,11 @@
 .card {
+  margin: 10px 0;
   background-color: #fff;
   border-radius: 8px;
   box-shadow:
       0 1px 1px rgba(9, 30, 66, 0.13),
       0 0 1px rgba(9, 30, 66, 0.08);
   list-style: none;
-}
-
-.card + .card {
-  margin-top: 10px;
 }
 
 .cardContent {

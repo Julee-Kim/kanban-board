@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import type { ColumnType } from '@/features/board/types.ts'
 import { useDroppable } from '@dnd-kit/core'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { updateColumnTitle, deleteColumn } from '@/api/columns.ts'
 import EditableText from '@/features/board/components/EditableText.tsx'
+import AddCardForm from '@/features/board/components/AddCardForm.tsx'
 import PButton from '@/components/PButton.tsx'
 import CardList from '@/features/board/components/CardList.tsx'
 import styles from '@/features/board/components/Column.module.css'
@@ -13,6 +15,7 @@ interface ColumnProps {
 
 const Column = ({ column }: ColumnProps) => {
   const queryClient = useQueryClient()
+  const [isAddingCard, setIsAddingCard] = useState(false)
 
   // 컬럼을 드롭 가능한 영역으로 설정
   const { setNodeRef, isOver } = useDroppable({ id: column.id })
@@ -58,8 +61,16 @@ const Column = ({ column }: ColumnProps) => {
           삭제
         </PButton>
       </div>
-      <CardList cards={column.cards} />
-      <PButton className={styles.btnAddCard}>+ 카드 추가</PButton>
+      <div className={styles.columnContent}>
+        <CardList cards={column.cards} />
+        {isAddingCard ? (
+          <AddCardForm columnId={column.id} onCancel={() => setIsAddingCard(false)} />
+        ) : (
+          <PButton className={styles.btnAddCard} onClick={() => setIsAddingCard(true)}>
+            + 카드 추가
+          </PButton>
+        )}
+      </div>
     </li>
   )
 }

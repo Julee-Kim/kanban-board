@@ -1,6 +1,29 @@
 import { cards } from '../db'
 
 /**
+ * 카드 생성
+ * @param columnId - 카드를 추가할 컬럼 ID
+ * @param title - 카드 제목
+ */
+export function createCard(columnId: string, title: string): void {
+  const columnCards = cards.filter((c) => c.columnId === columnId)
+  const maxOrder = columnCards.length > 0 ? Math.max(...columnCards.map((c) => c.order)) : -1
+
+  const newCard = {
+    id: crypto.randomUUID(),
+    columnId,
+    title,
+    description: '',
+    order: maxOrder + 1,
+    dueDate: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+
+  cards.push(newCard)
+}
+
+/**
  * 카드 내용 수정
  * @param cardId - 수정할 카드 ID
  * @param title - 새로운 제목
