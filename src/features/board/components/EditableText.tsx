@@ -64,8 +64,11 @@ const EditableText = ({
 
   useEffect(() => {
     if (isEditing && textareaRef.current) {
+      // 커서를 텍스트 끝으로 이동
       const len = textareaRef.current.value.length
       textareaRef.current.setSelectionRange(len, len)
+      // 여러 줄 텍스트일 경우 높이 자동 조절
+      autoResizeTextarea(textareaRef.current)
     }
   }, [isEditing])
 

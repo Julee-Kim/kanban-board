@@ -10,8 +10,10 @@
 
 .titleInput {
   width: 100%;
+  min-height: 41px;
   padding: 8px 12px;
   font-size: 14px;
+  line-height: 1.5;
   background-color: #fff;
   border: 2px solid rgb(185 172 255);
   border-radius: 8px;
