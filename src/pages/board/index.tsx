@@ -2,6 +2,10 @@ import { useQuery } from '@tanstack/react-query'
 import { DndContext, DragOverlay } from '@dnd-kit/core'
 import { fetchColumns } from '@/api/columns.ts'
 import { CardDetailModalProvider } from '@/features/board/contexts/CardDetailModalProvider.tsx'
+import {
+  useCardDetailModalState,
+  useCardDetailModalActions,
+} from '@/features/board/contexts/useCardDetailModal.ts'
 import { useCardDragAndDrop } from '@/features/board/hooks/useCardDragAndDrop.ts'
 import ColumnList from '@/features/board/components/ColumnList.tsx'
 import Card from '@/features/board/components/Card.tsx'
@@ -14,6 +18,8 @@ const BoardContent = () => {
     queryKey: ['columns'],
     queryFn: fetchColumns,
   })
+  const { isOpen, selectedCard } = useCardDetailModalState()
+  const { closeModal } = useCardDetailModalActions()
 
   // 서버 상태 (실제 데이터)
   const serverColumns = data?.data ?? []
@@ -52,7 +58,9 @@ const BoardContent = () => {
         <AddColumn />
 
         {/* Card 클릭을 통해 열리고, CardDetailModalProvider에서 제어되는 카드 상세 모달 */}
-        <ModalCardDetail />
+        {selectedCard && (
+          <ModalCardDetail isOpen={isOpen} card={selectedCard} onClose={closeModal} />
+        )}
       </div>
 
       {/* 드래그 중 카드 그림자 효과 */}

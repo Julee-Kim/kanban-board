@@ -4,32 +4,75 @@
 
 .label {
   display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
   font-weight: 600;
 }
 
-.titleLabel::after {
-  content: '*';
-  padding-left: 3px;
-  display: inline-block;
+.required {
   color: #ff0000;
 }
 
-.textarea {
+.textareaWrapper {
+  position: relative;
+}
+
+.charCount {
+  display: block;
+  text-align: right;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #999;
+}
+
+.titleInput,
+.descriptionInput {
+  display: block;
   width: 100%;
-  font-weight: 400;
+  min-height: 35px;
+  font-size: 14px;
+  line-height: 21px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  resize: none;
+  overflow: hidden;
+}
+
+.titleInput:focus,
+.descriptionInput:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.descriptionInput {
+  max-height: 250px;
+  overflow-y: auto;
 }
 
 .dateArea {
   display: grid;
   grid-template-columns: auto 1fr;
-  row-gap: 6px;
+  row-gap: 4px;
   column-gap: 8px;
+  margin-top: 20px;
   padding-bottom: 20px;
+  font-size: 13px;
+  color: #666;
 }
 
 .dateArea dt {
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
+}
+
+.dateArea dd {
+  margin: 0;
+}
+
+.overdue {
+  color: #ff0000;
 }
 
 .modalFooterInner {
