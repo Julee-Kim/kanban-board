@@ -19,7 +19,7 @@ export const cardsHandlers = [
     await simulateNetworkDelay()
     const body = (await request.json()) as CreateCardBody
     createCard(body.column_id, body.title)
-    return HttpResponse.json({ success: true })
+    return HttpResponse.json({ data: null }, { status: 201 })
   }),
 
   http.patch('/api/cards/:id', async ({ params, request }) => {
@@ -37,13 +37,13 @@ export const cardsHandlers = [
       updateCardPosition(id as string, body.column_id, body.order)
     }
 
-    return HttpResponse.json({ success: true })
+    return HttpResponse.json({ data: null })
   }),
 
   http.delete('/api/cards/:id', async ({ params }) => {
     await simulateNetworkDelay()
     const { id } = params
     deleteCard(id as string)
-    return HttpResponse.json({ success: true })
+    return HttpResponse.json({ data: null })
   }),
 ]

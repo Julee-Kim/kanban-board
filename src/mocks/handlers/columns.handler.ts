@@ -17,7 +17,7 @@ export const columnsHandlers = [
     await simulateNetworkDelay()
     const body = (await request.json()) as { title: string }
     createColumn(body.title)
-    return HttpResponse.json({ success: true })
+    return HttpResponse.json({ data: null }, { status: 201 })
   }),
 
   http.patch('/api/columns/:id', async ({ params, request }) => {
@@ -28,10 +28,13 @@ export const columnsHandlers = [
     const success = updateColumnTitle(id as string, body.title)
 
     if (!success) {
-      return HttpResponse.json({ error: 'Column not found' }, { status: 404 })
+      return HttpResponse.json(
+        { error: { code: 'COLUMN_NOT_FOUND', message: '컬럼을 찾을 수 없습니다.' } },
+        { status: 404 }
+      )
     }
 
-    return HttpResponse.json({ success: true })
+    return HttpResponse.json({ data: null })
   }),
 
   http.delete('/api/columns/:id', async ({ params }) => {
@@ -41,9 +44,12 @@ export const columnsHandlers = [
     const success = deleteColumn(id as string)
 
     if (!success) {
-      return HttpResponse.json({ error: 'Column not found' }, { status: 404 })
+      return HttpResponse.json(
+        { error: { code: 'COLUMN_NOT_FOUND', message: '컬럼을 찾을 수 없습니다.' } },
+        { status: 404 }
+      )
     }
 
-    return HttpResponse.json({ success: true })
+    return HttpResponse.json({ data: null })
   }),
 ]
