@@ -8,7 +8,7 @@ import { updateCard, deleteCard } from '@/api/cards.ts'
 import { formatDateTime } from '@/utils/date.ts'
 import { autoResizeTextarea } from '@/utils/textarea.ts'
 import { updateCardInCache, removeCardFromCache } from '@/features/board/utils/cache'
-import Modal from '@/components/PModal.tsx'
+import PModal from '@/components/PModal.tsx'
 import PButton from '@/components/PButton.tsx'
 import styles from './ModalCardDetail.module.css'
 
@@ -124,10 +124,10 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
   }, [title, description])
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <Modal.Overlay />
-      <Modal.Header>카드 상세</Modal.Header>
-      <Modal.Content>
+    <PModal isOpen={isOpen} onClose={onClose}>
+      <PModal.Overlay />
+      <PModal.Header>카드 상세</PModal.Header>
+      <PModal.Content>
         <div className={styles.box}>
           <label className={styles.label}>
             제목 <span className={styles.required}>*</span>
@@ -170,8 +170,8 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
           <dt>수정일: </dt>
           <dd>{formatDateTime(card.updated_at ?? '')}</dd>
         </dl>
-      </Modal.Content>
-      <Modal.Footer>
+      </PModal.Content>
+      <PModal.Footer>
         <div className={styles.modalFooterInner}>
           <PButton
             className={styles.btnDelete}
@@ -193,8 +193,8 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
             </PButton>
           </div>
         </div>
-      </Modal.Footer>
-    </Modal>
+      </PModal.Footer>
+    </PModal>
   )
 }
 

@@ -100,7 +100,7 @@ function ModalComponent({ isOpen, onClose, children }: ModalProps): ReactPortal 
 }
 
 // ========== Modal with Sub Components ==========
-const Modal = Object.assign(ModalComponent, {
+const PModal = Object.assign(ModalComponent, {
   Overlay,
   Header,
   Content,
@@ -112,4 +112,4 @@ const Modal = Object.assign(ModalComponent, {
   Footer: typeof Footer
 }
 
-export default Modal
+export default PModal
