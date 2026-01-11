@@ -51,34 +51,44 @@ export function createColumn(title: string): ColumnDTO {
  * 컬럼 제목 수정
  * @param columnId - 수정할 컬럼 ID
  * @param title - 새로운 제목
+ * @returns 수정된 컬럼 DTO, 컬럼이 없으면 null
  */
-export function updateColumnTitle(columnId: string, title: string): boolean {
+export function updateColumnTitle(columnId: string, title: string): ColumnDTO | null {
   const column = columns.find((c) => c.id === columnId)
-  if (!column) return false
+  if (!column) return null
 
   column.title = title
-  return true
+
+  return {
+    id: column.id,
+    title: column.title,
+    order: column.order,
+    created_at: column.createdAt,
+  }
 }
 
 /**
  * 컬럼 삭제
  * @param columnId - 삭제할 컬럼 ID
+ * @returns 삭제된 카드 수, 컬럼이 없으면 null
  */
-export function deleteColumn(columnId: string): boolean {
+export function deleteColumn(columnId: string): { deleted_cards_count: number } | null {
   const columnIndex = columns.findIndex((c) => c.id === columnId)
-  if (columnIndex === -1) return false
+  if (columnIndex === -1) return null
 
   // 컬럼 삭제
   columns.splice(columnIndex, 1)
 
   // 해당 컬럼의 카드들도 삭제
+  let deletedCardsCount = 0
   for (let i = cards.length - 1; i >= 0; i--) {
     if (cards[i].columnId === columnId) {
       cards.splice(i, 1)
+      deletedCardsCount++
     }
   }
 
-  return true
+  return { deleted_cards_count: deletedCardsCount }
 }
 
 /* ----------------- helpers (function 내부 로직 분리) ----------------- */

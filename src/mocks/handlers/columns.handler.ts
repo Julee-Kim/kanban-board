@@ -34,31 +34,36 @@ export const columnsHandlers = [
     const { id } = params
     const body = (await request.json()) as { title: string }
 
-    const success = updateColumnTitle(id as string, body.title)
+    const updatedColumn = updateColumnTitle(id as string, body.title)
 
-    if (!success) {
+    if (!updatedColumn) {
       return HttpResponse.json(
         { error: { code: 'COLUMN_NOT_FOUND', message: '컬럼을 찾을 수 없습니다.' } },
         { status: 404 }
       )
     }
 
-    return HttpResponse.json({ data: null })
+    return HttpResponse.json({ data: updatedColumn })
   }),
 
   http.delete('/api/columns/:id', async ({ params }) => {
     await simulateNetworkDelay()
     const { id } = params
 
-    const success = deleteColumn(id as string)
+    const result = deleteColumn(id as string)
 
-    if (!success) {
+    if (!result) {
       return HttpResponse.json(
         { error: { code: 'COLUMN_NOT_FOUND', message: '컬럼을 찾을 수 없습니다.' } },
         { status: 404 }
       )
     }
 
-    return HttpResponse.json({ data: null })
+    return HttpResponse.json({
+      data: {
+        success: true,
+        deleted_cards_count: result.deleted_cards_count,
+      },
+    })
   }),
 ]

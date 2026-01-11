@@ -42,14 +42,24 @@ export const updateColumnTitle = async (columnId: string, title: string): Promis
   if (!res.ok) await handleApiError(res, '컬럼 제목 수정에 실패했습니다.')
 }
 
+interface DeleteColumnRes {
+  data: {
+    success: boolean
+    deleted_cards_count: number
+  }
+}
+
 /**
  * 컬럼 삭제 API
  * @param columnId - 삭제할 컬럼 ID
+ * @returns 삭제 결과 (삭제된 카드 수 포함)
  */
-export const deleteColumn = async (columnId: string): Promise<void> => {
+export const deleteColumn = async (columnId: string): Promise<DeleteColumnRes> => {
   const res = await fetch(`/api/columns/${columnId}`, {
     method: 'DELETE',
   })
 
   if (!res.ok) await handleApiError(res, '컬럼 삭제에 실패했습니다.')
+
+  return await res.json()
 }
