@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'sonner'
 import type { ColumnType } from '@/features/board/types.ts'
 import { useDroppable } from '@dnd-kit/core'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -31,6 +32,7 @@ const Column = ({ column }: ColumnProps) => {
     mutationFn: () => deleteColumn(column.id),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['columns'] })
+      toast.success('컬럼이 삭제되었습니다.')
     },
   })
 

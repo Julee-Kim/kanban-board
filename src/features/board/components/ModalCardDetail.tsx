@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import type { ChangeEvent } from 'react'
+import { toast } from 'sonner'
 import type { CardType } from '@/features/board/types.ts'
 import { CARD_TITLE_MAX_LENGTH, CARD_DESCRIPTION_MAX_LENGTH } from '@/features/board/constants.ts'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -28,6 +29,7 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
       updateCard(card.id, title, description),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['columns'] })
+      toast.success('카드가 수정되었습니다.')
       onClose()
     },
   })
@@ -36,6 +38,7 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
     mutationFn: () => deleteCard(card.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['columns'] })
+      toast.success('카드가 삭제되었습니다.')
       onClose()
     },
   })
