@@ -1,12 +1,12 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import type { ChangeEvent, KeyboardEvent, FormEvent, FocusEvent } from 'react'
+import { toast } from 'sonner'
 import { autoResizeTextarea } from '@/utils/textarea.ts'
 import PButton from '@/components/PButton.tsx'
 import styles from './AddItemForm.module.css'
 
 interface AddItemFormProps {
-  placeholder: string // textarea placeholder 텍스트
-  submitLabel: string // 제출 버튼 라벨
+  itemName: string // 항목 이름 (예: '컬럼', '카드')
   isPending: boolean // 제출 중 상태 (중복 제출 방지)
   onSubmit: (title: string) => void // 제출 시 호출되는 콜백
   onCancel: () => void // 취소 시 호출되는 콜백
@@ -15,8 +15,7 @@ interface AddItemFormProps {
 }
 
 const AddItemForm = ({
-  placeholder,
-  submitLabel,
+  itemName,
   maxLength,
   isPending,
   onSubmit,
@@ -24,7 +23,6 @@ const AddItemForm = ({
   className,
 }: AddItemFormProps) => {
   const [title, setTitle] = useState('')
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = maxLength ? e.target.value.slice(0, maxLength) : e.target.value
@@ -36,7 +34,10 @@ const AddItemForm = ({
     if (isPending) return
 
     const trimmed = title.trim()
-    if (!trimmed) return
+    if (!trimmed) {
+      toast.warning(`${itemName} 제목을 입력해주세요.`)
+      return
+    }
     onSubmit(trimmed)
   }
 
@@ -67,18 +68,17 @@ const AddItemForm = ({
     <div className={`${styles.addItemForm} ${className ?? ''}`} onBlur={handleBlur}>
       <form onSubmit={handleSubmit}>
         <textarea
-          ref={textareaRef}
           value={title}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={`${itemName} 제목 입력`}
           className={styles.titleInput}
           rows={1}
           autoFocus
         />
         <div className={styles.buttons}>
           <PButton type="submit" className={styles.btnSubmit} disabled={isPending}>
-            {submitLabel}
+            {`${itemName} 추가`}
           </PButton>
           <PButton type="button" onClick={onCancel} className={styles.btnCancel}>
             취소

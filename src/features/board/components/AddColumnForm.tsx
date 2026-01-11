@@ -29,8 +29,7 @@ const AddColumnForm = ({ onCancel }: AddColumnFormProps) => {
 
   return (
     <AddItemForm
-      placeholder="컬럼 제목 입력"
-      submitLabel="컬럼 추가"
+      itemName="컬럼"
       maxLength={COLUMN_TITLE_MAX_LENGTH}
       isPending={createColumnMutation.isPending}
       onSubmit={handleSubmit}

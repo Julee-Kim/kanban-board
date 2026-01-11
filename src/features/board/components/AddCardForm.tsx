@@ -29,8 +29,7 @@ const AddCardForm = ({ columnId, onCancel }: AddCardFormProps) => {
 
   return (
     <AddItemForm
-      placeholder="카드 제목 입력"
-      submitLabel="카드 추가"
+      itemName="카드"
       maxLength={CARD_TITLE_MAX_LENGTH}
       isPending={createCardMutation.isPending}
       onSubmit={handleSubmit}
