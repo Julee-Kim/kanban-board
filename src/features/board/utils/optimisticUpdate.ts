@@ -1,5 +1,8 @@
 import type { CardType, ColumnType, FetchColumnsRes } from '@/features/board/types'
 
+// 카드 수정 시 업데이트할 수 있는 필드
+type CardUpdates = Pick<CardType, 'title' | 'description' | 'due_date' | 'updated_at'>
+
 /**
  * 캐시에서 특정 컬럼의 제목을 업데이트
  *
@@ -42,7 +45,7 @@ export const removeColumnFromCache = (data: FetchColumnsRes, columnId: string): 
 export const updateCardInCache = (
   data: FetchColumnsRes,
   cardId: string,
-  updates: Partial<CardType>
+  updates: CardUpdates
 ): FetchColumnsRes => {
   // 새로운 컬럼 배열 생성
   const newColumns: ColumnType[] = []

@@ -1,4 +1,13 @@
 /**
+ * ISO 문자열을 datetime-local input 형식(YYYY-MM-DDTHH:mm)으로 변환
+ * @param isoString - ISO 형식의 날짜 문자열 또는 null
+ */
+export const formatDateTimeISO = (isoString: string | null): string => {
+  if (!isoString) return ''
+  return isoString.slice(0, 16)
+}
+
+/**
  * ISO 날짜 문자열을 '2025년 1월 12일 AM 12:14' 형식으로 변환
  * @param iso - ISO 형식의 날짜 문자열
  */

@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import type { CardType, FetchColumnsRes } from '@/features/board/types'
 import { CARD_TITLE_MAX_LENGTH, CARD_DESCRIPTION_MAX_LENGTH } from '@/features/board/constants.ts'
 import { updateCard, deleteCard } from '@/api/cards.ts'
-import { formatDateTime } from '@/utils/date.ts'
+import { formatDateTime, formatDateTimeISO } from '@/utils/date.ts'
 import { autoResizeTextarea } from '@/utils/textarea.ts'
 import { updateCardInCache, removeCardFromCache } from '@/features/board/utils/optimisticUpdate'
 import PModal from '@/components/PModal.tsx'
@@ -22,17 +22,25 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
   const queryClient = useQueryClient()
   const [title, setTitle] = useState(card.title)
   const [description, setDescription] = useState(card.description)
+  const [dueDate, setDueDate] = useState(formatDateTimeISO(card.due_date))
   const titleRef = useRef<HTMLTextAreaElement>(null)
   const descriptionRef = useRef<HTMLTextAreaElement>(null)
 
   const updateCardMutation = useMutation({
-    mutationFn: ({ title, description }: { title: string; description: string }) =>
-      updateCard(card.id, title, description),
+    mutationFn: ({
+      title,
+      description,
+      dueDate,
+    }: {
+      title: string
+      description: string
+      dueDate: string | null
+    }) => updateCard(card.id, title, description, dueDate),
     onSuccess: () => {
       toast.success('카드가 수정되었습니다.')
       onClose()
     },
-    onMutate: async ({ title, description }) => {
+    onMutate: async ({ title, description, dueDate }) => {
       // 낙관적 업데이트 중 이전 데이터로 덮어씌워지는 것을 방지
       await queryClient.cancelQueries({ queryKey: ['columns'] })
 
@@ -45,6 +53,7 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
         return updateCardInCache(old, card.id, {
           title,
           description,
+          due_date: dueDate || null,
           updated_at: new Date().toISOString(),
         })
       })
@@ -104,17 +113,29 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
     autoResizeTextarea(e.target)
   }
 
+  const handleDueDateChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setDueDate(e.target.value)
+  }
+
   const handleSave = () => {
     if (!title.trim()) {
       alert('제목을 입력해주세요')
       return
     }
-    updateCardMutation.mutate({ title: title.trim(), description: description.trim() })
+    const dueDateValue = dueDate || null
+    updateCardMutation.mutate({
+      title: title.trim(),
+      description: description.trim(),
+      dueDate: dueDateValue,
+    })
   }
 
   const isOverdue = card.due_date ? new Date(card.due_date) < new Date() : false
   // 변경사항이 없으면 저장 버튼 비활성화
-  const hasChanges = title.trim() !== card.title || description.trim() !== card.description
+  const hasChanges =
+    title.trim() !== card.title ||
+    description.trim() !== card.description ||
+    dueDate !== formatDateTimeISO(card.due_date)
 
   useEffect(() => {
     autoResizeTextarea(titleRef.current)
@@ -158,16 +179,21 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
             </span>
           </div>
         </div>
-        <dl className={styles.dateArea}>
-          <dt className={isOverdue ? styles.overdue : ''}>마감일: </dt>
-          <dd className={isOverdue ? styles.overdue : ''}>{formatDateTime(card.due_date ?? '')}</dd>
-
-          <dt>생성일: </dt>
-          <dd>{formatDateTime(card.created_at ?? '')}</dd>
-
-          <dt>수정일: </dt>
-          <dd>{formatDateTime(card.updated_at ?? '')}</dd>
-        </dl>
+        <div className={`${styles.box} ${styles.dueDateRow}`}>
+          <label className={styles.label}>마감일</label>
+          <input
+            type="datetime-local"
+            value={dueDate}
+            className={`${styles.dueDateInput} ${isOverdue ? styles.dueDateOverdue : ''}`}
+            onChange={handleDueDateChange}
+          />
+        </div>
+        <div className={styles.dateArea}>
+          <span className={styles.dateLabel}>생성일</span>
+          <span className={styles.dateValue}>{formatDateTime(card.created_at ?? '')}</span>
+          <span className={styles.dateLabel}>수정일</span>
+          <span className={styles.dateValue}>{formatDateTime(card.updated_at ?? '')}</span>
+        </div>
       </PModal.Content>
       <PModal.Footer>
         <div className={styles.modalFooterInner}>

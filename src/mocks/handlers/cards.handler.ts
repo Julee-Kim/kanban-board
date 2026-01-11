@@ -8,8 +8,9 @@ interface CreateCardBody {
 }
 
 interface UpdateCardBody {
-  title?: string
-  description?: string
+  title: string
+  description: string
+  due_date: string | null
 }
 
 interface MoveCardBody {
@@ -39,7 +40,7 @@ export const cardsHandlers = [
     const { id } = params
     const body = (await request.json()) as UpdateCardBody
 
-    const updatedCard = updateCard(id as string, body.title ?? '', body.description ?? '')
+    const updatedCard = updateCard(id as string, body.title, body.description, body.due_date)
 
     if (!updatedCard) {
       return HttpResponse.json(

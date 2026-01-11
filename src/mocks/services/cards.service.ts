@@ -1,6 +1,17 @@
 import { cards } from '../db'
 import type { CardDTO } from '../types/dto'
 
+// ISO 8601 형식으로 변환 (밀리초 제외)
+const toISOStringWithoutMs = (date: Date): string => {
+  return date.toISOString().replace(/\.\d{3}Z$/, 'Z')
+}
+
+// datetime-local 형식(YYYY-MM-DDTHH:mm)을 ISO 8601 형식(YYYY-MM-DDTHH:mm:00Z)으로 변환
+const toISODueDate = (dateTimeLocal: string | null): string | null => {
+  if (!dateTimeLocal) return null
+  return `${dateTimeLocal}:00Z`
+}
+
 /**
  * 카드 생성
  * @param columnId - 카드를 추가할 컬럼 ID
@@ -11,6 +22,7 @@ export function createCard(columnId: string, title: string): CardDTO {
   const columnCards = cards.filter((c) => c.columnId === columnId)
   const maxOrder = columnCards.length > 0 ? Math.max(...columnCards.map((c) => c.order)) : -1
 
+  const now = toISOStringWithoutMs(new Date())
   const newCard = {
     id: crypto.randomUUID(),
     columnId,
@@ -18,8 +30,8 @@ export function createCard(columnId: string, title: string): CardDTO {
     description: '',
     order: maxOrder + 1,
     dueDate: null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
   }
 
   cards.push(newCard)
@@ -41,15 +53,22 @@ export function createCard(columnId: string, title: string): CardDTO {
  * @param cardId - 수정할 카드 ID
  * @param title - 새로운 제목
  * @param description - 새로운 설명
+ * @param dueDate - 마감일 (YYYY-MM-DDTHH:mm 형식 또는 null)
  * @returns 수정된 카드 DTO, 카드가 없으면 null
  */
-export function updateCard(cardId: string, title: string, description: string): CardDTO | null {
+export function updateCard(
+  cardId: string,
+  title: string,
+  description: string,
+  dueDate: string | null
+): CardDTO | null {
   const card = cards.find((c) => c.id === cardId)
   if (!card) return null
 
   card.title = title
   card.description = description
-  card.updatedAt = new Date().toISOString()
+  card.dueDate = toISODueDate(dueDate)
+  card.updatedAt = toISOStringWithoutMs(new Date())
 
   return {
     id: card.id,

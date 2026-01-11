@@ -25,14 +25,20 @@ export const createCard = async (columnId: string, title: string): Promise<CardR
  * @param cardId - 수정할 카드 ID
  * @param title - 새로운 제목
  * @param description - 새로운 설명
+ * @param dueDate - 마감일 (YYYY-MM-DDTHH:mm 형식 또는 null)
  */
-export const updateCard = async (cardId: string, title: string, description: string): Promise<CardRes> => {
+export const updateCard = async (
+  cardId: string,
+  title: string,
+  description: string,
+  dueDate: string | null
+): Promise<CardRes> => {
   const res = await fetch(`/api/cards/${cardId}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ title, description }),
+    body: JSON.stringify({ title, description, due_date: dueDate }),
   })
 
   if (!res.ok) await handleApiError(res, '카드 수정에 실패했습니다.')
