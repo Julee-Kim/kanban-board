@@ -8,10 +8,10 @@ export const queryClient = new QueryClient({
       staleTime: MINUTE, // 1분 동안 fresh
       gcTime: MINUTE * 5, // 5분 동안 캐시 유지
       refetchOnWindowFocus: false, // 창 포커스 시 자동 리페치 비활성화
-      retry: 1,
+      retry: 1, // 실패 시 1번만 재시도
     },
     mutations: {
-      retry: 0, // 중복 생성/수정 방지
+      retry: 1, // mutation 실패 시 1번만 재시도
     },
   },
   queryCache: new QueryCache({
