@@ -7,7 +7,7 @@ import { CARD_TITLE_MAX_LENGTH, CARD_DESCRIPTION_MAX_LENGTH } from '@/features/b
 import { updateCard, deleteCard } from '@/api/cards.ts'
 import { formatDateTime } from '@/utils/date.ts'
 import { autoResizeTextarea } from '@/utils/textarea.ts'
-import { updateCardInCache, removeCardFromCache } from '@/features/board/utils/cache'
+import { updateCardInCache, removeCardFromCache } from '@/features/board/utils/optimisticUpdate'
 import PModal from '@/components/PModal.tsx'
 import PButton from '@/components/PButton.tsx'
 import styles from './ModalCardDetail.module.css'
