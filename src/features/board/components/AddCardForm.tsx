@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import { createCard } from '@/api/cards.ts'
 import { CARD_TITLE_MAX_LENGTH } from '@/features/board/constants.ts'
 import AddItemForm from '@/features/board/components/AddItemForm.tsx'
@@ -17,9 +16,6 @@ const AddCardForm = ({ columnId, onCancel }: AddCardFormProps) => {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['columns'] })
       onCancel()
-    },
-    onError: () => {
-      toast.error('카드 생성에 실패했습니다.')
     },
   })
 
