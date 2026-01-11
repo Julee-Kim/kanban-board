@@ -51,6 +51,8 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
   }
 
   const isOverdue = card.due_date ? new Date(card.due_date) < new Date() : false
+  // 변경사항이 없으면 저장 버튼 비활성화
+  const hasChanges = title.trim() !== card.title || description.trim() !== card.description
 
   useEffect(() => {
     autoResizeTextarea(titleRef.current)
@@ -112,7 +114,7 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
             <PButton className={styles.btnClose} onClick={onClose}>
               닫기
             </PButton>
-            <PButton className={styles.btnSave} onClick={handleSave}>
+            <PButton className={styles.btnSave} disabled={!hasChanges} onClick={handleSave}>
               저장
             </PButton>
           </div>

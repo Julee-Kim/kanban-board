@@ -104,3 +104,8 @@
   background-color: var(--primary);
 }
 
+.btnSave:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
