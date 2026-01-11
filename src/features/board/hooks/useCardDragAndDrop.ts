@@ -2,7 +2,6 @@ import { useState } from 'react'
 import type { DragEndEvent, DragOverEvent, DragStartEvent } from '@dnd-kit/core'
 import { PointerSensor, useSensor, useSensors, KeyboardSensor } from '@dnd-kit/core'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import type { CardType, ColumnType } from '@/features/board/types.ts'
 import { updateCardPosition } from '@/api/cards.ts'
 
@@ -255,7 +254,6 @@ export const useCardDragAndDrop = ({
       }
       // 로컬 상태도 리셋하여 서버 데이터로 복원
       setLocalColumns(null)
-      toast.error('카드 이동에 실패했습니다.')
     },
   })
 

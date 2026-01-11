@@ -56,7 +56,6 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
       if (context?.previousData) {
         queryClient.setQueryData(['columns'], context.previousData)
       }
-      toast.error('카드 수정에 실패했습니다.')
     },
   })
 
@@ -86,7 +85,6 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
       if (context?.previousData) {
         queryClient.setQueryData(['columns'], context.previousData)
       }
-      toast.error('카드 삭제에 실패했습니다.')
     },
   })
 

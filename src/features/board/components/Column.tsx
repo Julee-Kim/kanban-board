@@ -44,7 +44,6 @@ const Column = ({ column }: ColumnProps) => {
       if (context?.previousData) {
         queryClient.setQueryData(['columns'], context.previousData)
       }
-      toast.error('컬럼 타이틀 수정에 실패했습니다.')
     },
   })
 
@@ -73,7 +72,6 @@ const Column = ({ column }: ColumnProps) => {
       if (context?.previousData) {
         queryClient.setQueryData(['columns'], context.previousData)
       }
-      toast.error('컬럼 삭제에 실패했습니다.')
     },
   })
 
