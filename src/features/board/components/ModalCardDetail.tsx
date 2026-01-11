@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import type { ChangeEvent } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { updateCard } from '@/api/cards.ts'
+import { autoResizeTextarea } from '@/utils/textarea.ts'
 import Modal from '@/components/PModal.tsx'
 import PButton from '@/components/PButton.tsx'
-import { autoResizeTextarea } from '@/utils/textarea.ts'
 import { formatDateTime } from '@/utils/date.ts'
 import styles from './ModalCardDetail.module.css'
 import { CARD_TITLE_MAX_LENGTH, CARD_DESCRIPTION_MAX_LENGTH } from '@/features/board/constants.ts'
@@ -15,10 +17,20 @@ interface ModalCardDetailProps {
 }
 
 const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
+  const queryClient = useQueryClient()
   const [title, setTitle] = useState(card.title)
   const [description, setDescription] = useState(card.description)
   const titleRef = useRef<HTMLTextAreaElement>(null)
   const descriptionRef = useRef<HTMLTextAreaElement>(null)
+
+  const updateCardMutation = useMutation({
+    mutationFn: ({ title, description }: { title: string; description: string }) =>
+      updateCard(card.id, title, description),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['columns'] })
+      onClose()
+    },
+  })
 
   const handleTitleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setTitle(e.target.value.slice(0, CARD_TITLE_MAX_LENGTH))
@@ -31,8 +43,11 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
   }
 
   const handleSave = () => {
-    console.log('Save card:', { title, description })
-    // TODO: API 호출
+    if (!title.trim()) {
+      alert('제목을 입력해주세요')
+      return
+    }
+    updateCardMutation.mutate({ title: title.trim(), description: description.trim() })
   }
 
   const isOverdue = card.due_date ? new Date(card.due_date) < new Date() : false

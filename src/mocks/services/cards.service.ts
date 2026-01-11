@@ -1,6 +1,21 @@
 import { cards } from '../db'
 
 /**
+ * 카드 내용 수정
+ * @param cardId - 수정할 카드 ID
+ * @param title - 새로운 제목
+ * @param description - 새로운 설명
+ */
+export function updateCard(cardId: string, title: string, description: string): void {
+  const card = cards.find((c) => c.id === cardId)
+  if (!card) return
+
+  card.title = title
+  card.description = description
+  card.updatedAt = new Date().toISOString()
+}
+
+/**
  * 카드 위치 업데이트
  * @param cardId - 업데이트할 카드 ID
  * @param columnId - 새로운 컬럼 ID
