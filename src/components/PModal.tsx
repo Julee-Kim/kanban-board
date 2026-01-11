@@ -28,11 +28,12 @@ const Overlay = ({ closeOnOverlay = true }: { closeOnOverlay?: boolean }) => {
   )
 }
 
-const Header = () => {
+const Header = ({ children }: { children: ReactNode }) => {
   const { onClose } = useModalContext()
 
   return (
     <div className={styles.modalHeader}>
+      <h3>{children}</h3>
       <button className={styles.btnClose} onClick={onClose} aria-label="모달 닫기">
         X
       </button>
