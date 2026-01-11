@@ -9,7 +9,7 @@ export const fetchColumns = async (): Promise<FetchColumnsRes> => {
     return await res.json()
   } catch (err) {
     console.error('fetchColumns fetch error:', err)
-    return { data: [] }
+    throw err
   }
 }
 

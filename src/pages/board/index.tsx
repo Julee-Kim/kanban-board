@@ -12,10 +12,11 @@ import Card from '@/features/board/components/Card.tsx'
 import AddColumn from '@/features/board/components/AddColumn.tsx'
 import ModalCardDetail from '@/features/board/components/ModalCardDetail.tsx'
 import BoardSkeleton from '@/features/board/components/BoardSkeleton.tsx'
+import ErrorMessage from '@/components/ErrorMessage.tsx'
 import styles from './index.module.css'
 
 const BoardContent = () => {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['columns'],
     queryFn: fetchColumns,
   })
@@ -41,7 +42,7 @@ const BoardContent = () => {
   }
 
   if (error) {
-    return <div className={styles.board}>에러가 발생했습니다.</div>
+    return <ErrorMessage message="데이터를 불러오는 중 문제가 발생했습니다." onRetry={refetch} />
   }
 
   return (
