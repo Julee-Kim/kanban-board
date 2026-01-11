@@ -100,7 +100,11 @@ const Column = ({ column }: ColumnProps) => {
           value={column.title}
           onSave={handleSaveTitle}
         />
-        <PButton className={styles.btnDeleteColumn} onClick={handleDeleteColumn}>
+        <PButton
+          className={styles.btnDeleteColumn}
+          onClick={handleDeleteColumn}
+          disabled={deleteColumnMutation.isPending}
+        >
           삭제
         </PButton>
       </div>

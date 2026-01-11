@@ -173,14 +173,22 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
       </Modal.Content>
       <Modal.Footer>
         <div className={styles.modalFooterInner}>
-          <PButton className={styles.btnDelete} onClick={handleDelete}>
+          <PButton
+            className={styles.btnDelete}
+            onClick={handleDelete}
+            disabled={deleteCardMutation.isPending}
+          >
             삭제
           </PButton>
           <div>
             <PButton className={styles.btnClose} onClick={onClose}>
               닫기
             </PButton>
-            <PButton className={styles.btnSave} disabled={!hasChanges} onClick={handleSave}>
+            <PButton
+              className={styles.btnSave}
+              disabled={!hasChanges || updateCardMutation.isPending}
+              onClick={handleSave}
+            >
               저장
             </PButton>
           </div>

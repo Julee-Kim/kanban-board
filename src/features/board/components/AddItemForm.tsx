@@ -77,7 +77,7 @@ const AddItemForm = ({
           autoFocus
         />
         <div className={styles.buttons}>
-          <PButton type="submit" className={styles.btnSubmit}>
+          <PButton type="submit" className={styles.btnSubmit} disabled={isPending}>
             {submitLabel}
           </PButton>
           <PButton type="button" onClick={onCancel} className={styles.btnCancel}>
