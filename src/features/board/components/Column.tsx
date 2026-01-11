@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import type { ColumnType } from '@/features/board/types.ts'
+import type { ColumnType, FetchColumnsRes } from '@/features/board/types.ts'
 import { useDroppable } from '@dnd-kit/core'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { updateColumnTitle, deleteColumn } from '@/api/columns.ts'
+import { removeColumnFromCache, updateColumnTitleInCache } from '@/features/board/utils/cache'
 import EditableText from '@/features/board/components/EditableText.tsx'
 import AddCardForm from '@/features/board/components/AddCardForm.tsx'
 import PButton from '@/components/PButton.tsx'
@@ -23,16 +24,56 @@ const Column = ({ column }: ColumnProps) => {
 
   const updateTitleMutation = useMutation({
     mutationFn: (newTitle: string) => updateColumnTitle(column.id, newTitle),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['columns'] })
+    onMutate: async (newTitle) => {
+      // 낙관적 업데이트 중 이전 데이터로 덮어씌워지는 것을 방지
+      await queryClient.cancelQueries({ queryKey: ['columns'] })
+
+      // 이전 데이터 백업 (에러 시 롤백용)
+      const previousData = queryClient.getQueryData<FetchColumnsRes>(['columns'])
+
+      // 캐시에서 컬럼 타이틀 즉시 업데이트
+      queryClient.setQueryData<FetchColumnsRes>(['columns'], (old) => {
+        if (!old) return old
+        return updateColumnTitleInCache(old, column.id, newTitle)
+      })
+
+      return { previousData }
+    },
+    onError: (_error, _variables, context) => {
+      // 에러 시 이전 상태로 롤백
+      if (context?.previousData) {
+        queryClient.setQueryData(['columns'], context.previousData)
+      }
+      toast.error('컬럼 타이틀 수정에 실패했습니다.')
     },
   })
 
   const deleteColumnMutation = useMutation({
     mutationFn: () => deleteColumn(column.id),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['columns'] })
+    onMutate: async () => {
+      // 낙관적 업데이트 중 이전 데이터로 덮어씌워지는 것을 방지
+      await queryClient.cancelQueries({ queryKey: ['columns'] })
+
+      // 이전 데이터 백업 (에러 시 롤백용)
+      const previousData = queryClient.getQueryData<FetchColumnsRes>(['columns'])
+
+      // 캐시에서 컬럼 즉시 제거
+      queryClient.setQueryData<FetchColumnsRes>(['columns'], (old) => {
+        if (!old) return old
+        return removeColumnFromCache(old, column.id)
+      })
+
+      return { previousData }
+    },
+    onSuccess: () => {
       toast.success('컬럼이 삭제되었습니다.')
+    },
+    onError: (_error, _variables, context) => {
+      // 에러 시 이전 상태로 롤백
+      if (context?.previousData) {
+        queryClient.setQueryData(['columns'], context.previousData)
+      }
+      toast.error('컬럼 삭제에 실패했습니다.')
     },
   })
 

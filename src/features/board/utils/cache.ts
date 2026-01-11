@@ -1,6 +1,37 @@
 import type { CardType, ColumnType, FetchColumnsRes } from '@/features/board/types'
 
 /**
+ * 캐시에서 특정 컬럼의 제목을 업데이트
+ *
+ * @param data - 현재 캐시된 컬럼 데이터
+ * @param columnId - 업데이트할 컬럼 ID
+ * @param newTitle - 새로운 제목
+ * @returns 컬럼 제목이 업데이트된 새로운 데이터 객체
+ */
+export const updateColumnTitleInCache = (
+  data: FetchColumnsRes,
+  columnId: string,
+  newTitle: string
+): FetchColumnsRes => {
+  const newColumns = data.data.map((column) =>
+    column.id === columnId ? { ...column, title: newTitle } : column
+  )
+  return { ...data, data: newColumns }
+}
+
+/**
+ * 캐시에서 특정 컬럼을 제거
+ *
+ * @param data - 현재 캐시된 컬럼 데이터
+ * @param columnId - 제거할 컬럼 ID
+ * @returns 컬럼이 제거된 새로운 데이터 객체
+ */
+export const removeColumnFromCache = (data: FetchColumnsRes, columnId: string): FetchColumnsRes => {
+  const newColumns = data.data.filter((column) => column.id !== columnId)
+  return { ...data, data: newColumns }
+}
+
+/**
  * 캐시에서 특정 카드를 찾아 업데이트
  *
  * @param data - 현재 캐시된 컬럼 데이터
