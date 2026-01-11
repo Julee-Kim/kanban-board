@@ -54,3 +54,20 @@ export const updateCardPosition = async (
     throw err
   }
 }
+
+/**
+ * 카드 삭제 API
+ * @param cardId - 삭제할 카드 ID
+ */
+export const deleteCard = async (cardId: string): Promise<void> => {
+  try {
+    const res = await fetch(`/api/cards/${cardId}`, {
+      method: 'DELETE',
+    })
+
+    if (!res.ok) throw new Error('deleteCard failed')
+  } catch (err) {
+    console.error('deleteCard fetch error:', err)
+    throw err
+  }
+}

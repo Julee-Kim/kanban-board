@@ -16,6 +16,25 @@ export function updateCard(cardId: string, title: string, description: string): 
 }
 
 /**
+ * 카드 삭제
+ * @param cardId - 삭제할 카드 ID
+ */
+export function deleteCard(cardId: string): void {
+  const cardIndex = cards.findIndex((c) => c.id === cardId)
+  if (cardIndex === -1) return
+
+  const deletedCard = cards[cardIndex]
+  cards.splice(cardIndex, 1)
+
+  // 같은 컬럼 내 카드들의 order 재정렬
+  const columnCards = cards.filter((c) => c.columnId === deletedCard.columnId)
+  columnCards.sort((a, b) => a.order - b.order)
+  columnCards.forEach((c, index) => {
+    c.order = index
+  })
+}
+
+/**
  * 카드 위치 업데이트
  * @param cardId - 업데이트할 카드 ID
  * @param columnId - 새로운 컬럼 ID

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import type { ChangeEvent } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { updateCard } from '@/api/cards.ts'
+import { updateCard, deleteCard } from '@/api/cards.ts'
 import { autoResizeTextarea } from '@/utils/textarea.ts'
 import Modal from '@/components/PModal.tsx'
 import PButton from '@/components/PButton.tsx'
@@ -31,6 +31,20 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
       onClose()
     },
   })
+
+  const deleteCardMutation = useMutation({
+    mutationFn: () => deleteCard(card.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['columns'] })
+      onClose()
+    },
+  })
+
+  const handleDelete = () => {
+    if (window.confirm('해당 카드를 삭제하시겠습니까?')) {
+      deleteCardMutation.mutate()
+    }
+  }
 
   const handleTitleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setTitle(e.target.value.slice(0, CARD_TITLE_MAX_LENGTH))
@@ -109,7 +123,9 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
       </Modal.Content>
       <Modal.Footer>
         <div className={styles.modalFooterInner}>
-          <PButton className={styles.btnDelete}>삭제</PButton>
+          <PButton className={styles.btnDelete} onClick={handleDelete}>
+            삭제
+          </PButton>
           <div>
             <PButton className={styles.btnClose} onClick={onClose}>
               닫기

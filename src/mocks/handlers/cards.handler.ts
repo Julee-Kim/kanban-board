@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw'
-import { updateCard, updateCardPosition } from '../services/cards.service'
+import { updateCard, updateCardPosition, deleteCard } from '../services/cards.service'
 
 interface UpdateCardBody {
   title?: string
@@ -23,6 +23,12 @@ export const cardsHandlers = [
       updateCardPosition(id as string, body.column_id, body.order)
     }
 
+    return HttpResponse.json({ success: true })
+  }),
+
+  http.delete('/api/cards/:id', ({ params }) => {
+    const { id } = params
+    deleteCard(id as string)
     return HttpResponse.json({ success: true })
   }),
 ]
