@@ -11,6 +11,7 @@ import ColumnList from '@/features/board/components/ColumnList.tsx'
 import Card from '@/features/board/components/Card.tsx'
 import AddColumn from '@/features/board/components/AddColumn.tsx'
 import ModalCardDetail from '@/features/board/components/ModalCardDetail.tsx'
+import BoardSkeleton from '@/features/board/components/BoardSkeleton.tsx'
 import styles from './index.module.css'
 
 const BoardContent = () => {
@@ -36,7 +37,7 @@ const BoardContent = () => {
   } = useCardDragAndDrop({ serverColumns })
 
   if (isLoading) {
-    return <div className={styles.board}>로딩 중...</div>
+    return <BoardSkeleton />
   }
 
   if (error) {
