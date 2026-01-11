@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect } from 'react'
 import type { ChangeEvent } from 'react'
-import { toast } from 'sonner'
-import type { CardType } from '@/features/board/types.ts'
-import { CARD_TITLE_MAX_LENGTH, CARD_DESCRIPTION_MAX_LENGTH } from '@/features/board/constants.ts'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import type { CardType, FetchColumnsRes } from '@/features/board/types'
+import { CARD_TITLE_MAX_LENGTH, CARD_DESCRIPTION_MAX_LENGTH } from '@/features/board/constants.ts'
 import { updateCard, deleteCard } from '@/api/cards.ts'
+import { formatDateTime } from '@/utils/date.ts'
 import { autoResizeTextarea } from '@/utils/textarea.ts'
+import { updateCardInCache, removeCardFromCache } from '@/features/board/utils/cache'
 import Modal from '@/components/PModal.tsx'
 import PButton from '@/components/PButton.tsx'
-import { formatDateTime } from '@/utils/date.ts'
 import styles from './ModalCardDetail.module.css'
 
 interface ModalCardDetailProps {
@@ -28,18 +29,72 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
     mutationFn: ({ title, description }: { title: string; description: string }) =>
       updateCard(card.id, title, description),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['columns'] })
       toast.success('카드가 수정되었습니다.')
       onClose()
+    },
+    onMutate: async ({ title, description }) => {
+      // 낙관적 업데이트 중 이전 데이터로 덮어씌워지는 것을 방지
+      await queryClient.cancelQueries({ queryKey: ['columns'] })
+
+      // 이전 데이터 백업 (에러 시 롤백용)
+      const previousData = queryClient.getQueryData<FetchColumnsRes>(['columns'])
+
+      // 캐시 즉시 업데이트
+      queryClient.setQueryData<FetchColumnsRes>(['columns'], (old) => {
+        if (!old) return old
+        return updateCardInCache(old, card.id, {
+          title,
+          description,
+          updated_at: new Date().toISOString(),
+        })
+      })
+
+      return { previousData }
+    },
+    onError: (_error, _variables, context) => {
+      // 에러 시 이전 상태로 롤백
+      if (context?.previousData) {
+        queryClient.setQueryData(['columns'], context.previousData)
+      }
+      toast.error('카드 수정에 실패했습니다.')
+    },
+    onSettled: () => {
+      // 성공/실패 여부와 관계없이 서버 데이터와 동기화
+      queryClient.invalidateQueries({ queryKey: ['columns'] })
     },
   })
 
   const deleteCardMutation = useMutation({
     mutationFn: () => deleteCard(card.id),
+    onMutate: async () => {
+      // 낙관적 업데이트 중 이전 데이터로 덮어씌워지는 것을 방지
+      await queryClient.cancelQueries({ queryKey: ['columns'] })
+
+      // 이전 데이터 백업 (에러 시 롤백용)
+      const previousData = queryClient.getQueryData<FetchColumnsRes>(['columns'])
+
+      // 캐시에서 카드 즉시 제거
+      queryClient.setQueryData<FetchColumnsRes>(['columns'], (old) => {
+        if (!old) return old
+        return removeCardFromCache(old, card.id)
+      })
+
+      return { previousData }
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['columns'] })
       toast.success('카드가 삭제되었습니다.')
       onClose()
+    },
+    onError: (_error, _variables, context) => {
+      // 에러 시 이전 상태로 롤백
+      if (context?.previousData) {
+        queryClient.setQueryData(['columns'], context.previousData)
+      }
+      toast.error('카드 삭제에 실패했습니다.')
+    },
+    onSettled: () => {
+      // 성공/실패 여부와 관계없이 서버 데이터와 동기화
+      queryClient.invalidateQueries({ queryKey: ['columns'] })
     },
   })
 
