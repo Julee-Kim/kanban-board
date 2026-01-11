@@ -10,16 +10,28 @@ interface CreateCardBody {
 interface UpdateCardBody {
   title?: string
   description?: string
-  column_id?: string
-  order?: number
+}
+
+interface MoveCardBody {
+  target_column_id: string
+  new_order: number
 }
 
 export const cardsHandlers = [
   http.post('/api/cards', async ({ request }) => {
     await simulateNetworkDelay()
     const body = (await request.json()) as CreateCardBody
-    createCard(body.column_id, body.title)
-    return HttpResponse.json({ data: null }, { status: 201 })
+
+    // 유효성 검사: 제목 누락 또는 길이 초과
+    if (!body.title?.trim() || body.title.length > 100) {
+      return HttpResponse.json(
+        { error: { code: 'VALIDATION_ERROR', message: '카드 제목은 1~100자 이내로 입력해주세요.' } },
+        { status: 400 }
+      )
+    }
+
+    const newCard = createCard(body.column_id, body.title)
+    return HttpResponse.json({ data: newCard }, { status: 201 })
   }),
 
   http.patch('/api/cards/:id', async ({ params, request }) => {
@@ -27,23 +39,39 @@ export const cardsHandlers = [
     const { id } = params
     const body = (await request.json()) as UpdateCardBody
 
-    // 카드 내용 수정 (title, description)
-    if (body.title !== undefined) {
-      updateCard(id as string, body.title, body.description ?? '')
+    const updatedCard = updateCard(id as string, body.title ?? '', body.description ?? '')
+
+    if (!updatedCard) {
+      return HttpResponse.json(
+        { error: { code: 'CARD_NOT_FOUND', message: '카드를 찾을 수 없습니다.' } },
+        { status: 404 }
+      )
     }
 
-    // 카드 위치 변경 (column_id, order)
-    if (body.column_id !== undefined && body.order !== undefined) {
-      updateCardPosition(id as string, body.column_id, body.order)
+    return HttpResponse.json({ data: updatedCard })
+  }),
+
+  http.patch('/api/cards/:id/move', async ({ params, request }) => {
+    await simulateNetworkDelay()
+    const { id } = params
+    const body = (await request.json()) as MoveCardBody
+
+    const movedCard = updateCardPosition(id as string, body.target_column_id, body.new_order)
+
+    if (!movedCard) {
+      return HttpResponse.json(
+        { error: { code: 'CARD_NOT_FOUND', message: '카드를 찾을 수 없습니다.' } },
+        { status: 404 }
+      )
     }
 
-    return HttpResponse.json({ data: null })
+    return HttpResponse.json({ data: movedCard })
   }),
 
   http.delete('/api/cards/:id', async ({ params }) => {
     await simulateNetworkDelay()
     const { id } = params
     deleteCard(id as string)
-    return HttpResponse.json({ data: null })
+    return HttpResponse.json({ data: { success: true } })
   }),
 ]

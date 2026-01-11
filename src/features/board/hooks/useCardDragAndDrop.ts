@@ -3,7 +3,7 @@ import type { DragEndEvent, DragOverEvent, DragStartEvent } from '@dnd-kit/core'
 import { PointerSensor, useSensor, useSensors, KeyboardSensor } from '@dnd-kit/core'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { CardType, ColumnType } from '@/features/board/types.ts'
-import { updateCardPosition } from '@/api/cards.ts'
+import { moveCard } from '@/api/cards.ts'
 
 /**
  * useCardDragAndDrop 훅의 입력 파라미터
@@ -222,16 +222,16 @@ export const useCardDragAndDrop = ({
   const queryClient = useQueryClient()
 
   // 카드 위치 업데이트 mutation
-  const updateCardPositionMutation = useMutation({
+  const moveCardMutation = useMutation({
     mutationFn: ({
       cardId,
-      columnId,
-      order,
+      targetColumnId,
+      newOrder,
     }: {
       cardId: string
-      columnId: string
-      order: number
-    }) => updateCardPosition(cardId, columnId, order),
+      targetColumnId: string
+      newOrder: number
+    }) => moveCard(cardId, targetColumnId, newOrder),
     onMutate: async () => {
       // 낙관적 업데이트 중 이전 데이터로 덮어씌워지는 것을 방지
       await queryClient.cancelQueries({ queryKey: ['columns'] })
@@ -389,10 +389,10 @@ export const useCardDragAndDrop = ({
       (originalCard.column_id !== finalCard.column_id || originalCard.order !== finalCard.order)
     ) {
       // 서버 상태 업데이트
-      updateCardPositionMutation.mutate({
+      moveCardMutation.mutate({
         cardId: finalCard.id,
-        columnId: finalCard.column_id,
-        order: finalCard.order,
+        targetColumnId: finalCard.column_id,
+        newOrder: finalCard.order,
       })
       // localColumns는 유지하고 onSuccess에서 리셋
     } else {
