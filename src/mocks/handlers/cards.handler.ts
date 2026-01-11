@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw'
+import { simulateNetworkDelay } from '../utils/delay'
 import { createCard, updateCard, updateCardPosition, deleteCard } from '../services/cards.service'
 
 interface CreateCardBody {
@@ -15,12 +16,14 @@ interface UpdateCardBody {
 
 export const cardsHandlers = [
   http.post('/api/cards', async ({ request }) => {
+    await simulateNetworkDelay()
     const body = (await request.json()) as CreateCardBody
     createCard(body.column_id, body.title)
     return HttpResponse.json({ success: true })
   }),
 
   http.patch('/api/cards/:id', async ({ params, request }) => {
+    await simulateNetworkDelay()
     const { id } = params
     const body = (await request.json()) as UpdateCardBody
 
@@ -37,7 +40,8 @@ export const cardsHandlers = [
     return HttpResponse.json({ success: true })
   }),
 
-  http.delete('/api/cards/:id', ({ params }) => {
+  http.delete('/api/cards/:id', async ({ params }) => {
+    await simulateNetworkDelay()
     const { id } = params
     deleteCard(id as string)
     return HttpResponse.json({ success: true })
