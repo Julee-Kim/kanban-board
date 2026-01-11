@@ -58,10 +58,6 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
       }
       toast.error('카드 수정에 실패했습니다.')
     },
-    onSettled: () => {
-      // 성공/실패 여부와 관계없이 서버 데이터와 동기화
-      queryClient.invalidateQueries({ queryKey: ['columns'] })
-    },
   })
 
   const deleteCardMutation = useMutation({
@@ -91,10 +87,6 @@ const ModalCardDetail = ({ isOpen, card, onClose }: ModalCardDetailProps) => {
         queryClient.setQueryData(['columns'], context.previousData)
       }
       toast.error('카드 삭제에 실패했습니다.')
-    },
-    onSettled: () => {
-      // 성공/실패 여부와 관계없이 서버 데이터와 동기화
-      queryClient.invalidateQueries({ queryKey: ['columns'] })
     },
   })
 

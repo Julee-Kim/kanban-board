@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { DragEndEvent, DragOverEvent, DragStartEvent } from '@dnd-kit/core'
 import { PointerSensor, useSensor, useSensors, KeyboardSensor } from '@dnd-kit/core'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import type { CardType, ColumnType } from '@/features/board/types.ts'
 import { updateCardPosition } from '@/api/cards.ts'
 
@@ -232,11 +233,29 @@ export const useCardDragAndDrop = ({
       columnId: string
       order: number
     }) => updateCardPosition(cardId, columnId, order),
-    onSuccess: async () => {
-      // 성공 시 컬럼 목록 쿼리 무효화하여 최신 데이터 가져오기
-      await queryClient.invalidateQueries({ queryKey: ['columns'] })
-      // 서버 데이터 갱신 완료 후 임시 상태 리셋
+    onMutate: async () => {
+      // 낙관적 업데이트 중 이전 데이터로 덮어씌워지는 것을 방지
+      await queryClient.cancelQueries({ queryKey: ['columns'] })
+
+      // 롤백을 위해 현재 서버 데이터 저장
+      const previousData = queryClient.getQueryData(['columns'])
+      return { previousData }
+    },
+    onSuccess: () => {
+      // 성공 시 로컬 상태를 캐시에 직접 반영 (불필요한 네트워크 요청 방지)
+      if (localColumns) {
+        queryClient.setQueryData(['columns'], { data: localColumns })
+      }
       setLocalColumns(null)
+    },
+    onError: (_error, _variables, context) => {
+      // 실패 시 이전 데이터로 롤백
+      if (context?.previousData) {
+        queryClient.setQueryData(['columns'], context.previousData)
+      }
+      // 로컬 상태도 리셋하여 서버 데이터로 복원
+      setLocalColumns(null)
+      toast.error('카드 이동에 실패했습니다.')
     },
   })
 
