@@ -1,16 +1,12 @@
 import type { FetchColumnsRes } from '@/features/board/types.ts'
+import { handleApiError } from './error'
 
 export const fetchColumns = async (): Promise<FetchColumnsRes> => {
-  try {
-    const res = await fetch('/api/columns')
+  const res = await fetch('/api/columns')
 
-    if (!res.ok) throw new Error('fetchColumns failed')
+  if (!res.ok) await handleApiError(res, '컬럼 목록을 불러오는데 실패했습니다.')
 
-    return await res.json()
-  } catch (err) {
-    console.error('fetchColumns fetch error:', err)
-    throw err
-  }
+  return await res.json()
 }
 
 /**
@@ -18,20 +14,15 @@ export const fetchColumns = async (): Promise<FetchColumnsRes> => {
  * @param title - 생성할 컬럼 제목
  */
 export const createColumn = async (title: string): Promise<void> => {
-  try {
-    const res = await fetch('/api/columns', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ title }),
-    })
+  const res = await fetch('/api/columns', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ title }),
+  })
 
-    if (!res.ok) throw new Error('createColumn failed')
-  } catch (err) {
-    console.error('createColumn fetch error:', err)
-    throw err
-  }
+  if (!res.ok) await handleApiError(res, '컬럼 생성에 실패했습니다.')
 }
 
 /**
@@ -40,20 +31,15 @@ export const createColumn = async (title: string): Promise<void> => {
  * @param title - 새로운 제목
  */
 export const updateColumnTitle = async (columnId: string, title: string): Promise<void> => {
-  try {
-    const res = await fetch(`/api/columns/${columnId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ title }),
-    })
+  const res = await fetch(`/api/columns/${columnId}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ title }),
+  })
 
-    if (!res.ok) throw new Error('updateColumnTitle failed')
-  } catch (err) {
-    console.error('updateColumnTitle fetch error:', err)
-    throw err
-  }
+  if (!res.ok) await handleApiError(res, '컬럼 제목 수정에 실패했습니다.')
 }
 
 /**
@@ -61,14 +47,9 @@ export const updateColumnTitle = async (columnId: string, title: string): Promis
  * @param columnId - 삭제할 컬럼 ID
  */
 export const deleteColumn = async (columnId: string): Promise<void> => {
-  try {
-    const res = await fetch(`/api/columns/${columnId}`, {
-      method: 'DELETE',
-    })
+  const res = await fetch(`/api/columns/${columnId}`, {
+    method: 'DELETE',
+  })
 
-    if (!res.ok) throw new Error('deleteColumn failed')
-  } catch (err) {
-    console.error('deleteColumn fetch error:', err)
-    throw err
-  }
+  if (!res.ok) await handleApiError(res, '컬럼 삭제에 실패했습니다.')
 }

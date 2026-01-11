@@ -15,9 +15,18 @@ export const columnsHandlers = [
 
   http.post('/api/columns', async ({ request }) => {
     await simulateNetworkDelay()
-    const body = (await request.json()) as { title: string }
-    createColumn(body.title)
-    return HttpResponse.json({ data: null }, { status: 201 })
+    const body = (await request.json()) as { title?: string }
+
+    // 유효성 검사: 제목 누락
+    if (!body.title?.trim()) {
+      return HttpResponse.json(
+        { error: { code: 'VALIDATION_ERROR', message: '컬럼 제목은 필수입니다.' } },
+        { status: 400 }
+      )
+    }
+
+    const newColumn = createColumn(body.title)
+    return HttpResponse.json({ data: newColumn }, { status: 201 })
   }),
 
   http.patch('/api/columns/:id', async ({ params, request }) => {

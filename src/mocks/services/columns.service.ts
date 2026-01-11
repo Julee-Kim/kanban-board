@@ -1,5 +1,5 @@
 import { columns, cards } from '../db'
-import type { CardDTO, ColumnWithCardsDTO } from '../types/column.dto'
+import type { CardDTO, ColumnDTO, ColumnWithCardsDTO } from '../types/column.dto'
 
 type RawCard = (typeof cards)[number]
 type RawColumn = (typeof columns)[number]
@@ -28,15 +28,23 @@ export function getColumnsWithCards(): { data: ColumnWithCardsDTO[] } {
 /**
  * 컬럼 생성
  * @param title - 생성할 컬럼 제목
+ * @returns 생성된 컬럼 DTO
  */
-export function createColumn(title: string): void {
+export function createColumn(title: string): ColumnDTO {
   const newColumn = {
-    id: `column-${Date.now()}`,
+    id: `col_${Date.now()}`,
     title,
     order: columns.length,
     createdAt: new Date().toISOString(),
   }
   columns.push(newColumn)
+
+  return {
+    id: newColumn.id,
+    title: newColumn.title,
+    order: newColumn.order,
+    created_at: newColumn.createdAt,
+  }
 }
 
 /**

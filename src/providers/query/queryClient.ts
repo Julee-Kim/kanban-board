@@ -1,4 +1,5 @@
 import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 const MINUTE = 1000 * 60
 
@@ -17,13 +18,18 @@ export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error, query) => {
       console.error(`[queryCache error - query key: ${query.queryKey}]`, error)
-      // TODO: 에러 처리
     },
   }),
   mutationCache: new MutationCache({
     onError: (error, _variables, _context, mutation) => {
       console.error(`[mutationCache error - mutation key: ${mutation.options.mutationKey}]`, error)
-      // TODO: 에러 처리
+
+      // 개별 mutation에서 onError를 정의한 경우 공통 토스트 표시 안 함
+      if (mutation.options.onError) return
+
+      // 서버 에러 메시지 또는 기본 메시지 표시
+      const message = error instanceof Error ? error.message : '요청에 실패했습니다.'
+      toast.error(message)
     },
   }),
 })

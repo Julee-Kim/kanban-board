@@ -1,4 +1,4 @@
-interface ColumnDTO {
+export interface ColumnDTO {
   id: string // UUID 형식 권장 (예: "col_a1b2c3d4")
   title: string // 컬럼 제목, 1~50자
   order: number // 정렬 순서, 0부터 시작
