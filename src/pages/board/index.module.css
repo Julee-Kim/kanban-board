@@ -1,4 +1,7 @@
 .board {
   display: flex;
+  height: 100vh;
   padding: 20px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
