@@ -1,4 +1,4 @@
-import type { FetchColumnsRes } from '@/features/board/types.ts'
+import type { FetchColumnsRes, ColumnRes, DeleteColumnRes } from '@/features/board/types.ts'
 import { handleApiError } from './error'
 
 export const fetchColumns = async (): Promise<FetchColumnsRes> => {
@@ -13,7 +13,7 @@ export const fetchColumns = async (): Promise<FetchColumnsRes> => {
  * 컬럼 생성 API
  * @param title - 생성할 컬럼 제목
  */
-export const createColumn = async (title: string): Promise<void> => {
+export const createColumn = async (title: string): Promise<ColumnRes> => {
   const res = await fetch('/api/columns', {
     method: 'POST',
     headers: {
@@ -23,6 +23,8 @@ export const createColumn = async (title: string): Promise<void> => {
   })
 
   if (!res.ok) await handleApiError(res, '컬럼 생성에 실패했습니다.')
+
+  return await res.json()
 }
 
 /**
@@ -30,7 +32,7 @@ export const createColumn = async (title: string): Promise<void> => {
  * @param columnId - 수정할 컬럼 ID
  * @param title - 새로운 제목
  */
-export const updateColumnTitle = async (columnId: string, title: string): Promise<void> => {
+export const updateColumnTitle = async (columnId: string, title: string): Promise<ColumnRes> => {
   const res = await fetch(`/api/columns/${columnId}`, {
     method: 'PATCH',
     headers: {
@@ -40,13 +42,8 @@ export const updateColumnTitle = async (columnId: string, title: string): Promis
   })
 
   if (!res.ok) await handleApiError(res, '컬럼 제목 수정에 실패했습니다.')
-}
 
-interface DeleteColumnRes {
-  data: {
-    success: boolean
-    deleted_cards_count: number
-  }
+  return await res.json()
 }
 
 /**

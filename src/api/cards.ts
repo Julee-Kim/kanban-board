@@ -1,3 +1,4 @@
+import type { CardRes, DeleteCardRes } from '@/features/board/types.ts'
 import { handleApiError } from './error'
 
 /**
@@ -5,7 +6,7 @@ import { handleApiError } from './error'
  * @param columnId - 카드를 추가할 컬럼 ID
  * @param title - 카드 제목
  */
-export const createCard = async (columnId: string, title: string): Promise<void> => {
+export const createCard = async (columnId: string, title: string): Promise<CardRes> => {
   const res = await fetch('/api/cards', {
     method: 'POST',
     headers: {
@@ -15,6 +16,8 @@ export const createCard = async (columnId: string, title: string): Promise<void>
   })
 
   if (!res.ok) await handleApiError(res, '카드 생성에 실패했습니다.')
+
+  return await res.json()
 }
 
 /**
@@ -23,7 +26,7 @@ export const createCard = async (columnId: string, title: string): Promise<void>
  * @param title - 새로운 제목
  * @param description - 새로운 설명
  */
-export const updateCard = async (cardId: string, title: string, description: string): Promise<void> => {
+export const updateCard = async (cardId: string, title: string, description: string): Promise<CardRes> => {
   const res = await fetch(`/api/cards/${cardId}`, {
     method: 'PATCH',
     headers: {
@@ -33,6 +36,8 @@ export const updateCard = async (cardId: string, title: string, description: str
   })
 
   if (!res.ok) await handleApiError(res, '카드 수정에 실패했습니다.')
+
+  return await res.json()
 }
 
 /**
@@ -41,7 +46,7 @@ export const updateCard = async (cardId: string, title: string, description: str
  * @param targetColumnId - 대상 컬럼 ID
  * @param newOrder - 새로운 순서
  */
-export const moveCard = async (cardId: string, targetColumnId: string, newOrder: number): Promise<void> => {
+export const moveCard = async (cardId: string, targetColumnId: string, newOrder: number): Promise<CardRes> => {
   const res = await fetch(`/api/cards/${cardId}/move`, {
     method: 'PATCH',
     headers: {
@@ -54,16 +59,20 @@ export const moveCard = async (cardId: string, targetColumnId: string, newOrder:
   })
 
   if (!res.ok) await handleApiError(res, '카드 이동에 실패했습니다.')
+
+  return await res.json()
 }
 
 /**
  * 카드 삭제 API
  * @param cardId - 삭제할 카드 ID
  */
-export const deleteCard = async (cardId: string): Promise<void> => {
+export const deleteCard = async (cardId: string): Promise<DeleteCardRes> => {
   const res = await fetch(`/api/cards/${cardId}`, {
     method: 'DELETE',
   })
 
   if (!res.ok) await handleApiError(res, '카드 삭제에 실패했습니다.')
+
+  return await res.json()
 }

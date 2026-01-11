@@ -20,3 +20,22 @@ export interface ColumnType {
 export interface FetchColumnsRes {
   data: ColumnType[]
 }
+
+export interface CardRes {
+  data: CardType
+}
+
+export interface DeleteCardRes {
+  data: { success: boolean }
+}
+
+export interface ColumnRes {
+  data: Omit<ColumnType, 'cards'>
+}
+
+export interface DeleteColumnRes {
+  data: {
+    success: boolean
+    deleted_cards_count: number
+  }
+}
