@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import type { ChangeEvent, KeyboardEvent } from 'react'
-import { autoResizeTextarea } from '@/utils/textarea.ts'
 import { COLUMN_TITLE_MAX_LENGTH } from '@/features/board/constants.ts'
+import { autoResizeTextarea } from '@/utils/textarea.ts'
 
 interface EditableTextProps {
   value: string

@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import type { ChangeEvent } from 'react'
+import type { CardType } from '@/features/board/types.ts'
+import { CARD_TITLE_MAX_LENGTH, CARD_DESCRIPTION_MAX_LENGTH } from '@/features/board/constants.ts'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { updateCard, deleteCard } from '@/api/cards.ts'
 import { autoResizeTextarea } from '@/utils/textarea.ts'
@@ -7,8 +9,6 @@ import Modal from '@/components/PModal.tsx'
 import PButton from '@/components/PButton.tsx'
 import { formatDateTime } from '@/utils/date.ts'
 import styles from './ModalCardDetail.module.css'
-import { CARD_TITLE_MAX_LENGTH, CARD_DESCRIPTION_MAX_LENGTH } from '@/features/board/constants.ts'
-import type { CardType } from '@/features/board/types.ts'
 
 interface ModalCardDetailProps {
   isOpen: boolean
