@@ -1,5 +1,5 @@
 import { columns, cards } from '../db'
-import type { CardDTO, ColumnDTO, ColumnWithCardsDTO } from '../types/column.dto'
+import type { CardDTO, ColumnDTO, ColumnWithCardsDTO } from '../types/dto'
 
 type RawCard = (typeof cards)[number]
 type RawColumn = (typeof columns)[number]

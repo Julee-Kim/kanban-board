@@ -13,7 +13,7 @@ export interface CardDTO {
   due_date: string | null // 마감일, ISO 8601 형식 또는 null
   order: number // 컬럼 내 정렬 순서, 0부터 시작
   created_at: string // 생성일, ISO 8601 형식
-  updated_at: string // 수정일, ISO 8601 형식
+  updated_at: string | null // 수정일, ISO 8601 형식 또는 null
 }
 
 export interface ColumnWithCardsDTO extends ColumnDTO {

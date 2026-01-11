@@ -1,5 +1,5 @@
 import { cards } from '../db'
-import type { CardDTO } from '../types/column.dto'
+import type { CardDTO } from '../types/dto'
 
 /**
  * 카드 생성
