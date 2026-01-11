@@ -1,6 +1,7 @@
 .btnAddColumn {
+  flex-shrink: 0;
   align-self: flex-start;
-  margin-left: 20px;
+  margin-left: 12px;
   padding: 12px;
   width: 270px;
   font-weight: 600;
