@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import type { DragEndEvent, DragOverEvent, DragStartEvent } from '@dnd-kit/core'
 import { PointerSensor, useSensor, useSensors, KeyboardSensor } from '@dnd-kit/core'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import type { CardType, ColumnType } from '@/features/board/types.ts'
-import { moveCard } from '@/api/cards.ts'
+import useCardMutations from '@/features/board/hooks/useCardMutations.ts'
 import {
   findCardByIdHelper,
   reorderCardsInColumnHelper,
@@ -48,48 +48,14 @@ export const useCardDragAndDrop = ({
 }: UseCardDragAndDropProps): UseCardDragAndDropReturn => {
   const queryClient = useQueryClient()
 
-  // 카드 위치 업데이트 mutation
-  const moveCardMutation = useMutation({
-    mutationFn: ({
-      cardId,
-      targetColumnId,
-      newOrder,
-    }: {
-      cardId: string
-      targetColumnId: string
-      newOrder: number
-    }) => moveCard(cardId, targetColumnId, newOrder),
-    onMutate: async () => {
-      // 낙관적 업데이트 중 이전 데이터로 덮어씌워지는 것을 방지
-      await queryClient.cancelQueries({ queryKey: ['columns'] })
-
-      // 롤백을 위해 현재 서버 데이터 저장
-      const previousData = queryClient.getQueryData(['columns'])
-      return { previousData }
-    },
-    onSuccess: () => {
-      // 성공 시 로컬 상태를 캐시에 직접 반영 (불필요한 네트워크 요청 방지)
-      if (localColumns) {
-        queryClient.setQueryData(['columns'], { data: localColumns })
-      }
-      setLocalColumns(null)
-    },
-    onError: (_error, _variables, context) => {
-      // 실패 시 이전 데이터로 롤백
-      if (context?.previousData) {
-        queryClient.setQueryData(['columns'], context.previousData)
-      }
-      // 로컬 상태도 리셋하여 서버 데이터로 복원
-      setLocalColumns(null)
-    },
-  })
-
   // 드래그 중 임시 상태
   // 드래그 중에는 localColumns 사용, 평소에는 serverColumns 사용
   const [localColumns, setLocalColumns] = useState<ColumnType[] | null>(null)
 
   // 드래그 중인 카드 정보
   const [activeCard, setActiveCard] = useState<CardType | null>(null)
+
+  const { moveCard } = useCardMutations()
 
   // 표시할 컬럼: 드래그 중이면 localColumns, 아니면 serverColumns
   const columns = localColumns ?? serverColumns
@@ -216,12 +182,26 @@ export const useCardDragAndDrop = ({
       (originalCard.column_id !== finalCard.column_id || originalCard.order !== finalCard.order)
     ) {
       // 서버 상태 업데이트
-      moveCardMutation.mutate({
-        cardId: finalCard.id,
-        targetColumnId: finalCard.column_id,
-        newOrder: finalCard.order,
-      })
-      // localColumns는 유지하고 onSuccess에서 리셋
+      moveCard(
+        {
+          cardId: finalCard.id,
+          targetColumnId: finalCard.column_id,
+          newOrder: finalCard.order,
+        },
+        {
+          onSuccess: () => {
+            // 성공 시 로컬 상태를 캐시에 직접 반영 (불필요한 네트워크 요청 방지)
+            if (localColumns) {
+              queryClient.setQueryData(['columns'], { data: localColumns })
+            }
+            setLocalColumns(null)
+          },
+          onError: () => {
+            // 로컬 상태도 리셋하여 서버 데이터로 복원
+            setLocalColumns(null)
+          },
+        }
+      )
     } else {
       // 위치가 변경되지 않았으면 즉시 로컬 상태 리셋
       setLocalColumns(null)

@@ -1,6 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createColumn } from '@/api/columns.ts'
 import { COLUMN_TITLE_MAX_LENGTH } from '@/features/board/constants.ts'
+import useColumnMutations from '@/features/board/hooks/useColumnMutations.ts'
 import AddItemForm from '@/features/board/components/shared/AddItemForm.tsx'
 import styles from './AddColumnForm.module.css'
 
@@ -9,25 +8,17 @@ interface AddColumnFormProps {
 }
 
 const AddColumnForm = ({ onCancel }: AddColumnFormProps) => {
-  const queryClient = useQueryClient()
-
-  const createColumnMutation = useMutation({
-    mutationFn: (title: string) => createColumn(title),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['columns'] })
-      onCancel()
-    },
-  })
+  const { createColumn, isCreating } = useColumnMutations()
 
   const handleSubmit = (title: string) => {
-    createColumnMutation.mutate(title)
+    createColumn(title, { onSuccess: onCancel })
   }
 
   return (
     <AddItemForm
       itemName="컬럼"
       maxLength={COLUMN_TITLE_MAX_LENGTH}
-      isPending={createColumnMutation.isPending}
+      isPending={isCreating}
       onSubmit={handleSubmit}
       onCancel={onCancel}
       className={styles.addColumnForm}
