@@ -11,7 +11,7 @@ import ColumnList from '@/features/board/components/column/ColumnList.tsx'
 import Card from '@/features/board/components/card/Card.tsx'
 import AddColumn from '@/features/board/components/column/AddColumn.tsx'
 import ModalCardDetail from '@/features/board/components/card/ModalCardDetail.tsx'
-import BoardSkeleton from '@/features/board/components/shared/BoardSkeleton.tsx'
+import BoardSkeleton from '@/features/board/components/skeleton/BoardSkeleton.tsx'
 import ErrorMessage from '@/components/ErrorMessage.tsx'
 import styles from './index.module.css'
 
